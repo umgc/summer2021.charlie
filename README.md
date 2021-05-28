@@ -5,6 +5,8 @@
 ## DevOps
 - Rob Wilson
 - Michelle Monfort
+- Jeroen Soeurt
+
 
 ## Team Charlie
 - 
