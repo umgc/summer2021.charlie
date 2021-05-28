@@ -12,6 +12,7 @@
 - Austin Johnson (Developer)
 
 - Team Charlie Roster:
+
 | Name | Role - Current | Go-By | Contact Number | Github ID/username
 | :--- | :--- | :--- | :--- | :--- 
 | Michael Le | PM |	mike | | lemike859
