@@ -10,7 +10,7 @@
 
 ## Team Charlie Access verification
 - Austin Johnson (Developer)
-
+- Didimus Kimbi (Developer)
 - Team Charlie Roster:
 
 | Name | Role - Current | Go-By | Contact Number | Github ID/username
