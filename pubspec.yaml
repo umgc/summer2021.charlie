@@ -1,5 +1,5 @@
-name: mic_stream_example
-description: A new Flutter project.
+name: mnemosyne
+description: A Flutter project for UMGC - Charlie.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
