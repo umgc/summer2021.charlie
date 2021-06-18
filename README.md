@@ -1,16 +1,8 @@
 # *summer2021.charlie*
 
-# **By Team Verification**
-
-## DevOps
-- Rob Wilson
-- Michelle Monfort
-- Jeroen Soeurt
-
+# Mnemosyne
 
 ## Team Charlie Access verification
-- Austin Johnson (Developer)
-- Didimus Kimbi (Developer)
 - Team Charlie Roster:
 
 | Name | Role - Current | Go-By | Contact Number | Github ID/username
@@ -23,3 +15,9 @@
 | Nicholas Ballo | Tester/Developer | Nick
 | Prince k Antwi Aboagye | Business Analyst | Prince
 
+## DevOps
+- Rob Wilson
+- Michelle Monfort
+- Jeroen Soeurt
+
+![Service Flow](images/UMGC-SWEN670.png)
