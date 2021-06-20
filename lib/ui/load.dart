@@ -7,9 +7,13 @@ class Load extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Load"),
+        leading: Icon(
+          Icons.view_headline_outlined,
+          size: 40,
+        ),
+        title: Text("View Notes"),
       ),
-      drawer: MenuDrawer(),
+      endDrawer: MenuDrawer(),
       body: LoadForm(),
     );
   }

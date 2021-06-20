@@ -7,9 +7,13 @@ class Save extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Save"),
+        leading: Icon(
+          Icons.new_label_outlined,
+          size: 40,
+        ),
+        title: Text("New Notes"),
       ),
-      drawer: MenuDrawer(),
+      endDrawer: MenuDrawer(),
       body: SaveForm(),
     );
   }

@@ -7,6 +7,7 @@ import 'package:rxdart/rxdart.dart';
 import 'package:sound_stream/sound_stream.dart';
 import 'recognized_content.dart';
 import 'menudrawer.dart';
+import 'textmap.dart';
 
 class AudioRecognize extends StatefulWidget {
   @override
@@ -15,12 +16,14 @@ class AudioRecognize extends StatefulWidget {
 
 class _AudioRecognizeState extends State<AudioRecognize> {
   final RecorderStream _recorder = RecorderStream();
+  TextMap logs = new TextMap();
 
   bool recognizing = false;
   bool recognizeFinished = false;
   String _text = '';
   StreamSubscription<List<int>> _audioStreamSubscription;
   BehaviorSubject<List<int>> _audioStream;
+  var outputText = '';
 
   @override
   void initState() {
@@ -33,9 +36,16 @@ class _AudioRecognizeState extends State<AudioRecognize> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Mnemosyne'),
+        leading: Icon(
+          Icons.memory_outlined,
+          size: 40,
+        ),
+        title: Text(
+          'Mnemosyne',
+          style: TextStyle(fontSize: 25),
+        ),
       ),
-      drawer: MenuDrawer(),
+      endDrawer: MenuDrawer(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
       floatingActionButton: AvatarGlow(
         animate: recognizing,
@@ -94,6 +104,7 @@ class _AudioRecognizeState extends State<AudioRecognize> {
         setState(() {
           _text = responseText;
           recognizeFinished = true;
+          _saveText();
         });
       } else {
         setState(() {
@@ -105,6 +116,18 @@ class _AudioRecognizeState extends State<AudioRecognize> {
       setState(() {
         recognizing = false;
       });
+    });
+  }
+
+  void _saveText() {
+    setState(() {
+      String curDateTime = DateTime.now().toString();
+      String curDate = curDateTime.substring(0, 10);
+      String curTime = curDateTime.substring(11);
+
+      logs.addLog(curDate, curTime, _text);
+
+      outputText = curDateTime + ": " + _text;
     });
   }
 

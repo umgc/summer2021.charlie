@@ -9,7 +9,7 @@ class SaveForm extends StatefulWidget {
 
 class _SaveFormState extends State<SaveForm> {
   final textController = TextEditingController();
-  String outputText = "Blank";
+  String outputText = '';
   TextMap logs = new TextMap();
 
   //Attempt to load file as this screen opens
