@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:convert';
 
 import 'textmap.dart';
 
@@ -8,24 +9,33 @@ class LoadForm extends StatefulWidget {
 }
 
 class _LoadFormState extends State<LoadForm> {
-  String outputText = "";
   TextMap logs = new TextMap();
+  String rawText = "";
+  String outputText = "";
+  Map _decryptedJson;
 
   //Attempt to load file as this screen opens
   void initState() {
     super.initState();
 
     Timer.run(() async {
-      String fileText = await logs.readFile();
+      String fileText = await logs.getDecryptedContent();
       setState(() {
-        logs.readJson(fileText);
+        _decryptedJson = logs.readJson(fileText);
+      });
+    });
+
+    Timer.run(() async {
+      String rawContent = await logs.readFile();
+      setState(() {
+        rawText = json.encode(rawContent);
       });
     });
   }
 
   void _loadButtonPressed() {
     setState(() {
-      outputText = logs.toJson();
+      outputText = logs.toJson(_decryptedJson);
     });
   }
 
@@ -37,22 +47,25 @@ class _LoadFormState extends State<LoadForm> {
 
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: [
-          ElevatedButton(
-            onPressed: () {
-              _loadButtonPressed();
-            },
-            child: Text("Load JSON File"),
-          ),
-          Text(outputText),
-          ElevatedButton(
-            onPressed: () {
-              _deleteButtonPressed();
-            },
-            child: Text("Clear JSON File"),
-          ),
-        ],
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            ElevatedButton(
+              onPressed: () {
+                _loadButtonPressed();
+              },
+              child: Text("Load JSON File"),
+            ),
+            Text(outputText),
+            ElevatedButton(
+              onPressed: () {
+                _deleteButtonPressed();
+              },
+              child: Text("Clear JSON File"),
+            ),
+            Text(rawText),
+          ],
+        ),
       ),
     );
   }
