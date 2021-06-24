@@ -14,7 +14,7 @@ class TextMap {
 
   //Adds log to the map matrix based on the passed date/time
   void addLog(String date, String time, String log) async {
-    String fileText = await readFile();
+    String fileText = await getDecryptedContent();
     Map dateTimeText = readJson(fileText);
     //check if current date exists in map
     if (dateTimeText.containsKey(date)) {

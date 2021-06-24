@@ -17,7 +17,7 @@ class _SaveFormState extends State<SaveForm> {
     super.initState();
 
     Timer.run(() async {
-      String fileText = await logs.readFile();
+      String fileText = await logs.getDecryptedContent();
       setState(() {
         logs.readJson(fileText);
       });
