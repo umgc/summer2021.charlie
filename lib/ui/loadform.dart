@@ -15,6 +15,7 @@ class _LoadFormState extends State<LoadForm> {
   Map _decryptedJson;
 
   //Attempt to load file as this screen opens
+  //Test change
   void initState() {
     super.initState();
 
