@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
 
 import 'textmap.dart';
 
@@ -11,18 +10,6 @@ class _SaveFormState extends State<SaveForm> {
   final textController = TextEditingController();
   String outputText = '';
   TextMap logs = new TextMap();
-
-  //Attempt to load file as this screen opens
-  void initState() {
-    super.initState();
-
-    Timer.run(() async {
-      String fileText = await logs.getDecryptedContent();
-      setState(() {
-        logs.readJson(fileText);
-      });
-    });
-  }
 
   @override
   void dispose() {
