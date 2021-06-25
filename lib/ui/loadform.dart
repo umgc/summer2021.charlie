@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'textmap.dart';
+import 'script.dart';
 
 class LoadForm extends StatefulWidget {
   _LoadFormState createState() => _LoadFormState();
@@ -13,6 +14,8 @@ class _LoadFormState extends State<LoadForm> {
   String rawText = "";
   String outputText = "";
   Map _decryptedJson;
+  Map curMenu;
+  bool onDates = true;
 
   //Attempt to load file as this screen opens
   void initState() {
@@ -22,6 +25,7 @@ class _LoadFormState extends State<LoadForm> {
       String fileText = await logs.getDecryptedContent();
       setState(() {
         _decryptedJson = logs.readJson(fileText);
+        curMenu = _decryptedJson;
       });
     });
 
@@ -29,44 +33,65 @@ class _LoadFormState extends State<LoadForm> {
       String rawContent = await logs.readFile();
       setState(() {
         rawText = json.encode(rawContent);
+        outputText = logs.toJson(_decryptedJson);
       });
     });
   }
 
-  void _loadButtonPressed() {
+  void _buttonPressed(String dateTime) {
     setState(() {
-      outputText = logs.toJson(_decryptedJson);
+      if (onDates) {
+        onDates = false;
+        curMenu = _decryptedJson[dateTime];
+      } else {
+        Navigator.push(
+            context,
+            new MaterialPageRoute(
+              builder: (context) =>
+                  new Script(log: curMenu[dateTime] as String),
+            ));
+      }
     });
   }
 
-  void _deleteButtonPressed() {
+  void _backButton() {
     setState(() {
-      logs.clear();
+      onDates = true;
+
+      curMenu = _decryptedJson;
     });
   }
 
   Widget build(BuildContext context) {
+    //Generating list of Dates for initial buttons
+    List<String> dateTimes = curMenu.keys.toList();
+    var listSize = dateTimes.length;
+    if (!onDates) {
+      listSize++;
+    }
+
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            ElevatedButton(
+      body: ListView.builder(
+          padding: const EdgeInsets.all(8),
+          itemCount: listSize,
+          itemBuilder: (BuildContext context, int i) {
+            if (!onDates && i == listSize - 1) {
+              //back button for list of times
+              return ElevatedButton(
+                onPressed: () {
+                  _backButton();
+                },
+                child: Text("Back"),
+              );
+            }
+            //Normal button for date or time listing
+            return ElevatedButton(
               onPressed: () {
-                _loadButtonPressed();
+                _buttonPressed(dateTimes[i]);
               },
-              child: Text("Load JSON File"),
-            ),
-            Text(outputText),
-            ElevatedButton(
-              onPressed: () {
-                _deleteButtonPressed();
-              },
-              child: Text("Clear JSON File"),
-            ),
-            Text(rawText),
-          ],
-        ),
-      ),
+              child: Text(dateTimes[i]),
+            );
+          }),
     );
   }
 }
