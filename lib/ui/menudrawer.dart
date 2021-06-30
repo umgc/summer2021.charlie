@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mnemosyne/ui/audio_recognize.dart';
 
-import 'save.dart';
+import 'audio_recognize.dart';
 import 'load.dart';
+import 'save.dart';
 import 'settings.dart';
 
 class MenuDrawer extends StatelessWidget {
@@ -38,7 +38,7 @@ class MenuDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  new MaterialPageRoute(builder: (context) => new Save()),
+                  MaterialPageRoute(builder: (context) => Save()),
                 );
               }),
           //Load Screen
@@ -56,7 +56,7 @@ class MenuDrawer extends StatelessWidget {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                new MaterialPageRoute(builder: (context) => new Load()),
+                MaterialPageRoute(builder: (context) => Load()),
               );
             },
           ),
@@ -75,7 +75,7 @@ class MenuDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  new MaterialPageRoute(builder: (context) => new Settings()),
+                  MaterialPageRoute(builder: (context) => Settings()),
                 );
               }),
           const Divider(
@@ -100,8 +100,8 @@ class MenuDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  new MaterialPageRoute(
-                      builder: (context) => new AudioRecognize()),
+                  MaterialPageRoute(
+                      builder: (context) => AudioRecognize()),
                 );
               }),
           //Previous Screen

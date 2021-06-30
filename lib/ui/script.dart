@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 
-import 'menudrawer.dart';
 import 'load.dart';
+import 'menudrawer.dart';
 
 class Script extends StatelessWidget {
   final String log;
 
+  ///Script to read
   Script({Key key, @required this.log}) : super(key: key);
 
   Widget build(BuildContext context) {
@@ -25,7 +26,7 @@ class Script extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                new MaterialPageRoute(builder: (context) => new Load()),
+                MaterialPageRoute(builder: (context) => Load()),
               );
             },
             child: Text("Back"),
