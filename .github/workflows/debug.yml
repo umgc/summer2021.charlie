@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Stable Linter, Build, Unit Test
+name: Develop Branch Linter, Build, Unit Test
 
 env:
   FLUTTER_VERSION: "debug"
