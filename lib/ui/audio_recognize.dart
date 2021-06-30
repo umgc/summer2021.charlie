@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/services.dart';
+import 'dart:convert';
 import 'package:google_speech/google_speech.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sound_stream/sound_stream.dart';
@@ -84,8 +85,8 @@ class _AudioRecognizeState extends State<AudioRecognize> {
     setState(() {
       recognizing = true;
     });
-    final serviceAccount = ServiceAccount.fromString(
-        '${(await rootBundle.loadString('assets/test_service_account.json'))}');
+
+    final serviceAccount = ServiceAccount.fromString(getServiceAccountJson());
     final speechToText = SpeechToText.viaServiceAccount(serviceAccount);
     final config = _getConfig();
 
@@ -117,6 +118,13 @@ class _AudioRecognizeState extends State<AudioRecognize> {
         recognizing = false;
       });
     });
+  }
+
+  String getServiceAccountJson() {
+    const base64String =
+        String.fromEnvironment('GOOGLE_SERVICE_ACCOUNT_BASE64');
+    Codec<String, String> base64Converter = utf8.fuse(base64);
+    return base64Converter.decode(base64String);
   }
 
   void _saveText() {
