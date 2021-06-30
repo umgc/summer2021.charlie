@@ -7,6 +7,7 @@ class Script extends StatelessWidget {
   final String log;
 
   Script({Key key, @required this.log}) : super(key: key);
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
