@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'load.dart';
 import 'menudrawer.dart';
 
+///Script file
 class Script extends StatelessWidget {
+  ///Log
   final String log;
 
   ///Script to read

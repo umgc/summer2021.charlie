@@ -11,6 +11,7 @@ import 'menudrawer.dart';
 import 'recognized_content.dart';
 import 'textmap.dart';
 
+///AudioRecognize UI
 class AudioRecognize extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _AudioRecognizeState();

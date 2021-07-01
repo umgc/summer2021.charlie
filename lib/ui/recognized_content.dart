@@ -17,9 +17,12 @@ final Map<String, HighlightedWord> _highlights = {
           const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
 };
 
+///RecognizedContent
 class RecognizedContent extends StatelessWidget {
+  ///Text string
   final String text;
 
+  ///Constructor
   const RecognizedContent({Key key, this.text}) : super(key: key);
 
   @override

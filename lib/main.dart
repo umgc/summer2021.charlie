@@ -45,6 +45,7 @@ void main() {
   runApp(MyApp());
 }
 
+///MyApp a stateless widget
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
