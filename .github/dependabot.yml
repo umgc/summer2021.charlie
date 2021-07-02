@@ -1,0 +1,10 @@
+# Basic set up for three package managers
+# Example: https://github.com/dotnet/samples/blob/main/.github/dependabot.yml
+version: 2
+updates:
+  - package-ecosystem: "github-actions"
+    directory: "/.github/workfows"
+    schedule:
+      interval: "weekly"
+      day: "wednesday"
+    open-pull-requests-limit: 5

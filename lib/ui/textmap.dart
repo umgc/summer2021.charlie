@@ -1,21 +1,24 @@
 import 'dart:async';
-import 'dart:io';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:path_provider/path_provider.dart';
 
 //path_provider needs to be downloaded
 //use $ flutter pub add path_provider
-import 'package:mnemosyne/service/encryption_service.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:mnemosyne/util/util.dart';
+import '../service/encryption_service.dart';
+import '../util/util.dart';
 
+///Text map for the JSON
 class TextMap {
+  ///Use this file name for saving
   final String mainFileName = "memory.txt";
-  final EncryptionService _encryptionService = new EncryptionService();
+  final EncryptionService _encryptionService = EncryptionService();
 
-  //Adds log to the map matrix based on the passed date/time
+  ///Adds log to the map matrix based on the passed date/time
   void addLog(String date, String time, String log) async {
-    String fileText = await getDecryptedContent();
-    Map dateTimeText = readJson(fileText);
+    var fileText = await getDecryptedContent();
+    var dateTimeText = readJson(fileText);
     //check if current date exists in map
     if (dateTimeText.containsKey(date)) {
       //existing date
@@ -24,7 +27,7 @@ class TextMap {
       dateTimeText[date] = times;
     } else {
       //new date
-      var times = new Map();
+      var times = {};
       times[time] = log;
       dateTimeText[date] = times;
     }
@@ -33,46 +36,48 @@ class TextMap {
     _writeFile(dateTimeText);
   }
 
-  //Writes map to fil as JSON String
+  ///Writes map to fil as JSON String
   _writeFile(Map dateTimeText) async {
-    File file = await getFile(mainFileName);
-    String encryptedBase64 = _encryptionService.encrypt(toJson(dateTimeText));
+    var file = await getFile(mainFileName);
+    var encryptedBase64 = _encryptionService.encrypt(toJson(dateTimeText));
     file.writeAsString(encryptedBase64);
   }
 
-  //Clears the map and the text file
+  ///Clears the map and the text file
   void clear() {
-    _writeFile(new Map());
+    _writeFile({});
   }
 
-  //Reads the file
+  ///Reads the file
   //Must be called outside of textmap as init
   Future<String> readFile() async {
-    String encryptedStringBase64 = "";
+    var encryptedStringBase64 = "";
     try {
-      File file = await getFile(mainFileName);
+      var file = await getFile(mainFileName);
       encryptedStringBase64 = await file.readAsString();
-    } catch (e) {
-      print("Couldn't read file");
+    } on Exception catch (e) {
+      print("Couldn't read file $e");
     }
     return encryptedStringBase64;
   }
 
+  ///Gets decrypted content
   Future<String> getDecryptedContent() async {
     return _encryptionService.decrypt(await readFile());
   }
 
+  ///Gets the file from the path
   Future<File> getFile(String fileName) async {
-    final Directory directory = await getApplicationDocumentsDirectory();
-    return File('${directory.path}/' + fileName);
+    final directory = await getApplicationDocumentsDirectory();
+    return File('${'${directory.path}/'}$fileName');
   }
 
-  //Generate map from passed JSON String
+  ///Generate map from passed JSON String
   Map readJson(String input) {
-    return input.isNotNullOrEmpty() ? json.decode(input) : new Map();
+    return input.isNotNullOrEmpty() ? json.decode(input) : {};
   }
 
-  //Converts the map to a JSON String.
+  ///Converts the map to a JSON String.
   String toJson(Map dateTimeText) {
     return json.encode(dateTimeText);
   }
