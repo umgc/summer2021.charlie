@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 
 import 'script.dart';
 import 'textmap.dart';
+
 ///LoadForm
 class LoadForm extends StatefulWidget {
   _LoadFormState createState() => _LoadFormState();
@@ -48,8 +49,7 @@ class _LoadFormState extends State<LoadForm> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) =>
-                  Script(log: curMenu[dateTime] as String),
+              builder: (context) => Script(log: curMenu[dateTime] as String),
             ));
       }
     });

@@ -56,7 +56,7 @@ class TextMap {
       var file = await getFile(mainFileName);
       encryptedStringBase64 = await file.readAsString();
     } on Exception catch (e) {
-      print("Couldn't read file $e" );
+      print("Couldn't read file $e");
     }
     return encryptedStringBase64;
   }

@@ -101,8 +101,7 @@ class MenuDrawer extends StatelessWidget {
                 Navigator.pop(context);
                 Navigator.push(
                   context,
-                  MaterialPageRoute(
-                      builder: (context) => AudioRecognize()),
+                  MaterialPageRoute(builder: (context) => AudioRecognize()),
                 );
               }),
           //Previous Screen
