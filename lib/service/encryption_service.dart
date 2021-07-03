@@ -1,4 +1,5 @@
 import 'package:encrypt/encrypt.dart';
+import '/util/util.dart';
 
 ///Encryption service
 class EncryptionService {
@@ -17,6 +18,8 @@ class EncryptionService {
   ///Decrypt
   String decrypt(String encryptedBase64) {
     final encryptor = Encrypter(AES(key));
-    return encryptor.decrypt(Encrypted.from64(encryptedBase64), iv: iv);
+    return encryptedBase64.isNullOrEmpty()
+        ? '{}'
+        : encryptor.decrypt(Encrypted.from64(encryptedBase64), iv: iv);
   }
 }
