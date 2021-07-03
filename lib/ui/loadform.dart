@@ -65,7 +65,8 @@ class _LoadFormState extends State<LoadForm> {
 
   Widget build(BuildContext context) {
     //Generating list of Dates for initial buttons
-    List<String> dateTimes = curMenu.keys.toList();
+    List<String> dateTimes =
+        curMenu == null || curMenu.keys == null ? [] : curMenu.keys.toList();
     var listSize = dateTimes.length;
     if (!onDates) {
       listSize++;
