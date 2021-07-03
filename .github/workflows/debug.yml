@@ -34,7 +34,7 @@ jobs:
       - name: Analyze Flutter
         uses: ValentinVignal/action-dart-analyze@v0.11
         with:
-          fail-on: "format"
+          fail-on: "analyze"
 
   build:
     name: Build Project
