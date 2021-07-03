@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'textmap.dart';
 
+///Save form
 class SaveForm extends StatefulWidget {
   _SaveFormState createState() => _SaveFormState();
 }
@@ -9,7 +10,7 @@ class SaveForm extends StatefulWidget {
 class _SaveFormState extends State<SaveForm> {
   final textController = TextEditingController();
   String outputText = '';
-  TextMap logs = new TextMap();
+  TextMap logs = TextMap();
 
   @override
   void dispose() {
@@ -19,16 +20,16 @@ class _SaveFormState extends State<SaveForm> {
 
   void _buttonPressed() {
     setState(() {
-      String inputText = textController.text;
+      var inputText = textController.text;
       textController.text = "";
 
-      String curDateTime = DateTime.now().toString();
-      String curDate = curDateTime.substring(0, 10);
-      String curTime = curDateTime.substring(11);
+      var curDateTime = DateTime.now().toString();
+      var curDate = curDateTime.substring(0, 10);
+      var curTime = curDateTime.substring(11);
 
       logs.addLog(curDate, curTime, inputText);
 
-      outputText = curDateTime + ": " + inputText;
+      outputText = "$curDateTime: $inputText";
     });
   }
 
