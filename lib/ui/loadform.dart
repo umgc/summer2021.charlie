@@ -78,22 +78,22 @@ class _LoadFormState extends State<LoadForm> {
         //Perform the search.
         onSearch = true;
         //Save serach term, trim it, and lower case it to avoid case issues
-        String searchTerm = textController.text.trim().toLowerCase();
+        var searchTerm = textController.text.trim().toLowerCase();
         textController.text = "";
 
         //Generate a new map that only contains logs with the search term
-        Map toReturn = Map();
-        Map curDate = Map();
+        var toReturn = {};
+        var curDate = {};
 
         //Loop through each date.
-        List dates = _decryptedJson.keys.toList();
+        var dates = _decryptedJson.keys.toList();
 
-        for (int d = 0; d < dates.length; d++) {
+        for (var d = 0; d < dates.length; d++) {
           curDate = _decryptedJson[dates[d]];
-          List times = curDate.keys.toList();
+          var times = curDate.keys.toList();
 
           //Loop through each time for this date.
-          for (int t = 0; t < times.length; t++) {
+          for (var t = 0; t < times.length; t++) {
             String curLog = curDate[times[t]].trim().toLowerCase();
 
             //Check if this log has the search term
@@ -114,7 +114,7 @@ class _LoadFormState extends State<LoadForm> {
 
   //Helper method: Adds a log for the passed date/time to the passed Map
   Map _addLog(String date, String time, String log, Map toAdd) {
-    Map toReturn = toAdd;
+    var toReturn = toAdd;
     //Check if current date exists in map
     if (toReturn.containsKey(date)) {
       //Existing date
@@ -133,7 +133,8 @@ class _LoadFormState extends State<LoadForm> {
 
   Widget build(BuildContext context) {
     //Generating list of Dates/Times for initial buttons
-    List dateTimes = curMenu.keys.toList();
+    List dateTimes =
+        curMenu == null || curMenu.keys == null ? [] : curMenu.keys.toList();
     var listSize = dateTimes.length + 1;
 
     if (onDates && !onSearch) {
