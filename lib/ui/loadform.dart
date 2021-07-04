@@ -1,16 +1,18 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 import 'dart:convert';
 
-import 'textmap.dart';
-import 'script.dart';
+import 'package:flutter/material.dart';
 
+import 'script.dart';
+import 'textmap.dart';
+
+///LoadForm
 class LoadForm extends StatefulWidget {
   _LoadFormState createState() => _LoadFormState();
 }
 
 class _LoadFormState extends State<LoadForm> {
-  TextMap logs = new TextMap();
+  TextMap logs = TextMap();
   String rawText = "";
   String outputText = "";
   Map _decryptedJson;
@@ -25,7 +27,7 @@ class _LoadFormState extends State<LoadForm> {
     super.initState();
 
     Timer.run(() async {
-      String fileText = await logs.getDecryptedContent();
+      var fileText = await logs.getDecryptedContent();
       setState(() {
         _decryptedJson = logs.readJson(fileText);
         topMenu = _decryptedJson;
@@ -34,7 +36,7 @@ class _LoadFormState extends State<LoadForm> {
     });
 
     Timer.run(() async {
-      String rawContent = await logs.readFile();
+      var rawContent = await logs.readFile();
       setState(() {
         rawText = json.encode(rawContent);
         outputText = logs.toJson(_decryptedJson);
@@ -50,9 +52,8 @@ class _LoadFormState extends State<LoadForm> {
       } else {
         Navigator.push(
             context,
-            new MaterialPageRoute(
-              builder: (context) =>
-                  new Script(log: curMenu[dateTime] as String),
+            MaterialPageRoute(
+              builder: (context) => Script(log: curMenu[dateTime] as String),
             ));
       }
     });
@@ -132,15 +133,16 @@ class _LoadFormState extends State<LoadForm> {
   }
 
   Widget build(BuildContext context) {
-    //Generating list of Dates/Times for initial buttons
-    List dateTimes = curMenu.keys.toList();
+    //Generating list of Dates for initial buttons
+    List dateTimes =
+        curMenu == null || curMenu.keys == null ? [] : curMenu.keys.toList();
     var listSize = dateTimes.length + 1;
-
-    if (onDates && !onSearch) {
+    
+     if (onDates && !onSearch) {
       listSize++;
     }
 
-    return Scaffold(
+     return Scaffold(
       body: ListView.builder(
           padding: const EdgeInsets.all(8),
           itemCount: listSize,
