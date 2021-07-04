@@ -3,7 +3,7 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Stable Linter, Build, Unit Test
+name: Develop Branch Linter, Build, Unit Test
 
 env:
   FLUTTER_VERSION: "debug"
@@ -27,14 +27,14 @@ jobs:
         uses: subosito/flutter-action@v1
         
       # Add formating standards
-      - run: flutter pub add --dev effective_dart
+      #- run: flutter pub add --dev effective_dart
       - run: flutter pub get
 
       # Analyze
       - name: Analyze Flutter
         uses: ValentinVignal/action-dart-analyze@v0.11
         with:
-          fail-on: "format"
+          fail-on: "analyze"
 
   build:
     name: Build Project

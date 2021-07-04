@@ -27,14 +27,13 @@ jobs:
         uses: subosito/flutter-action@v1
         
       # Add formating standards
-      - run: flutter pub add --dev effective_dart
       - run: flutter pub get
 
       # Analyze
       - name: Analyze Flutter
         uses: ValentinVignal/action-dart-analyze@v0.11
         with:
-          fail-on: "format"
+          fail-on: "analyze"
 
   build:
     name: Build Project

@@ -1,14 +1,17 @@
 import 'dart:async';
-import 'package:flutter/material.dart';
+import 'dart:convert';
+
 import 'package:avatar_glow/avatar_glow.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:google_speech/google_speech.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sound_stream/sound_stream.dart';
-import 'recognized_content.dart';
+
 import 'menudrawer.dart';
+import 'recognized_content.dart';
 import 'textmap.dart';
 
+///AudioRecognize UI
 class AudioRecognize extends StatefulWidget {
   @override
   State<StatefulWidget> createState() => _AudioRecognizeState();
@@ -16,14 +19,14 @@ class AudioRecognize extends StatefulWidget {
 
 class _AudioRecognizeState extends State<AudioRecognize> {
   final RecorderStream _recorder = RecorderStream();
-  TextMap logs = new TextMap();
+  TextMap logs = TextMap();
 
   bool recognizing = false;
   bool recognizeFinished = false;
   String _text = '';
   StreamSubscription<List<int>> _audioStreamSubscription;
   BehaviorSubject<List<int>> _audioStream;
-  var outputText = '';
+  String outputText = '';
 
   @override
   void initState() {
@@ -84,8 +87,8 @@ class _AudioRecognizeState extends State<AudioRecognize> {
     setState(() {
       recognizing = true;
     });
-    final serviceAccount = ServiceAccount.fromString(
-        '${(await rootBundle.loadString('assets/test_service_account.json'))}');
+
+    final serviceAccount = ServiceAccount.fromString(getServiceAccountJson());
     final speechToText = SpeechToText.viaServiceAccount(serviceAccount);
     final config = _getConfig();
 
@@ -100,7 +103,7 @@ class _AudioRecognizeState extends State<AudioRecognize> {
           data.results.map((e) => e.alternatives.first.transcript).join('\n');
 
       if (data.results.first.isFinal) {
-        responseText += '\n' + currentText;
+        responseText += '\n$currentText';
         setState(() {
           _text = responseText;
           recognizeFinished = true;
@@ -108,7 +111,7 @@ class _AudioRecognizeState extends State<AudioRecognize> {
         });
       } else {
         setState(() {
-          _text = responseText + '\n' + currentText;
+          _text = '$responseText\n$currentText';
           recognizeFinished = true;
         });
       }
@@ -119,15 +122,22 @@ class _AudioRecognizeState extends State<AudioRecognize> {
     });
   }
 
+  String getServiceAccountJson() {
+    const base64String =
+        String.fromEnvironment('GOOGLE_SERVICE_ACCOUNT_BASE64');
+    var base64Converter = utf8.fuse(base64);
+    return base64Converter.decode(base64String);
+  }
+
   void _saveText() {
     setState(() {
-      String curDateTime = DateTime.now().toString();
-      String curDate = curDateTime.substring(0, 10);
-      String curTime = curDateTime.substring(11);
+      var curDateTime = DateTime.now().toString();
+      var curDate = curDateTime.substring(0, 10);
+      var curTime = curDateTime.substring(11);
 
       logs.addLog(curDate, curTime, _text);
 
-      outputText = curDateTime + ": " + _text;
+      outputText = "$curDateTime: $_text";
     });
   }
 
