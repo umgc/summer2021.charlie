@@ -36,7 +36,37 @@ class TextMap {
     _writeFile(dateTimeText);
   }
 
-  ///Writes map to fil as JSON String
+  ///Changes the log at passed date/time to the passed log
+  void changeLog(String date, String time, String log) async {
+    var fileText = await getDecryptedContent();
+    var dateTimeText = readJson(fileText);
+    var toChange = dateTimeText[date];
+
+    toChange[time] = log;
+    dateTimeText[date] = toChange;
+
+    //Write to file after changing log
+    await _writeFile(dateTimeText);
+  }
+
+  ///Deletes the log at the passed date/time from the map matrix
+  void deleteLog(String date, String time) async {
+    var fileText = await getDecryptedContent();
+    var dateTimeText = readJson(fileText);
+
+    //Remove the time key first
+    dateTimeText[date].remove(time);
+
+    //If the date now has no times associated, it must also be removed
+    if (dateTimeText[date].length == 0) {
+      dateTimeText.remove(date);
+    }
+
+    //Write to file after deleting log
+    await _writeFile(dateTimeText);
+  }
+
+  ///Writes map to file as JSON String
   _writeFile(Map dateTimeText) async {
     var file = await getFile(mainFileName);
     var encryptedBase64 = _encryptionService.encrypt(toJson(dateTimeText));
