@@ -51,14 +51,11 @@ class TextMap {
   ///Reads the file
   //Must be called outside of textmap as init
   Future<String> readFile() async {
-    var encryptedStringBase64 = "";
-    try {
-      var file = await getFile(mainFileName);
-      encryptedStringBase64 = await file.readAsString();
-    } on Exception catch (e) {
-      print("Couldn't read file $e");
+    var file = await getFile(mainFileName);
+    if (!await file.exists()) {
+      await _writeFile({});
     }
-    return encryptedStringBase64;
+    return await file.readAsString();
   }
 
   ///Gets decrypted content
