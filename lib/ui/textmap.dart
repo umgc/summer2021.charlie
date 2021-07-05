@@ -33,11 +33,11 @@ class TextMap {
     }
 
     //Write to file after adding log
-    _writeFile(dateTimeText);
+    writeFile(dateTimeText);
   }
 
   ///Writes map to fil as JSON String
-  _writeFile(Map dateTimeText) async {
+  void writeFile(Map dateTimeText) async {
     var file = await getFile(mainFileName);
     var encryptedBase64 = _encryptionService.encrypt(toJson(dateTimeText));
     file.writeAsString(encryptedBase64);
@@ -45,7 +45,7 @@ class TextMap {
 
   ///Clears the map and the text file
   void clear() {
-    _writeFile({});
+    writeFile({});
   }
 
   ///Reads the file
@@ -53,7 +53,7 @@ class TextMap {
   Future<String> readFile() async {
     var file = await getFile(mainFileName);
     if (!await file.exists()) {
-      await _writeFile({});
+      await writeFile({});
     }
     return await file.readAsString();
   }

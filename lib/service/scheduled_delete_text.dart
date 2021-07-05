@@ -1,71 +1,36 @@
-import 'package:mnemosyne/ui/textmap.dart';
-import 'dart:convert';
-import 'dart:io';
-
-import 'package:path_provider/path_provider.dart';
-import 'encryption_service.dart';
 import 'package:workmanager/workmanager.dart';
 
+import '../ui/textmap.dart';
+
+///schedule delete
 class ScheduledDeleteText {
-  final EncryptionService _encryptionService = EncryptionService();
-  final String mainFileName = "memory.txt";
-  final TextMap logs = new TextMap();
+  /// logs
+  final TextMap logs = TextMap();
 
-  void deleteText(int numberDays) async {
-    String fileText = await logs.getDecryptedContent();
-    Map dateTimeText = logs.readJson(fileText);
+  void _deleteText(int numberDays) async {
+    var fileText = await logs.getDecryptedContent();
+    var dateTimeText = logs.readJson(fileText);
 
-    //dateTimeText.removeWhere((key, value) => false)
     dateTimeText.removeWhere((key, value) {
-//Date dt = convertStringToDate(key);
-      DateTime dt = DateTime.parse(key);
-//return dt < now() - numberOfDays;
-      return dt.isBefore(DateTime.now().subtract(new Duration(days: 7)));
-    });
-
-    /*
-    //dateTimeText.removeWhere((key, value) => false)
-    dateTimeText.removeWhere((key, value) {
-      //Date dt = convertStringToDate(key);
       var dt = DateTime.parse(key);
-      //return dt < now() - numberOfDays;
-      return dt < DateTime.now().subtract(new Duration(days: 7));
+      //todo add isFavorites exception for deletes
+      return dt.isBefore(DateTime.now().subtract(Duration(days: numberDays)));
     });
-    */
-    var file = await getFile(mainFileName);
-    var encryptedBase64 = _encryptionService.encrypt(toJson(dateTimeText));
-    file.writeAsString(encryptedBase64);
-  }
-
-  String toJson(Map dateTimeText) {
-    return json.encode(dateTimeText);
-  }
-
-  ///Get file from path
-
-  Future<File> getFile(String fileName) async {
-    final directory = await getApplicationDocumentsDirectory();
-    return File('${'${directory.path}/'}$fileName');
+    //Write to file after adding log
+    logs.writeFile(dateTimeText);
   }
 }
 
-/// integrate workmanager scheduler
-
-const simplePeriodic1HourTask = "simplePeriodic1HourTask";
-
+/// callback dispatcher
 void callbackDispatcher() {
   Workmanager().executeTask((task, inputData) async {
-    switch (task) {
-      case simplePeriodic1HourTask:
-        var scheduledDeleteText = ScheduledDeleteText();
-        scheduledDeleteText.deleteText(7);
-        print("$simplePeriodic1HourTask was executed");
-        break;
-    }
+    var scheduledDeleteText = ScheduledDeleteText();
+    scheduledDeleteText._deleteText(7);
     return Future.value(true);
   });
 }
 
+/// initialising work manager
 void initialize() {
   Workmanager().initialize(
     callbackDispatcher,
@@ -73,50 +38,8 @@ void initialize() {
   );
   Workmanager().registerPeriodicTask(
     "6",
-    simplePeriodic1HourTask,
+    "Periodic1hourTask",
     initialDelay: Duration(seconds: 10),
     frequency: Duration(minutes: 15),
   );
 }
-
-
-/*
-class ScheduledDeleteText {
-  TextMap logs = new TextMap();
-  void deleteText (int numberDays) async {
-
-    String fileText = await logs.getDecryptedContent();
-    Map dateTimeText = logs.readJson(fileText);
-
-
-
-    //dateTimeText.removeWhere((key, value) => false)
-    dateTimeText.removeWhere((key, value) {
-//Date dt = convertStringToDate(key);
-      DateTime dt = DateTime.parse(key);
-//return dt < now() - numberOfDays;
-      return dt.isBefore(DateTime.now().subtract(new Duration(days: 7)));
-    });
-
-
-    /*
-    //dateTimeText.removeWhere((key, value) => false)
-    dateTimeText.removeWhere((key, value) {
-      //Date dt = convertStringToDate(key);
-      var dt = DateTime.parse(key);
-      //return dt < now() - numberOfDays;
-      return dt < DateTime.now().subtract(new Duration(days: 7));
-    });
-    */
-
-  }
-
-
-  var encryptedBase64 = _encryptionService.encrypt(toJson(dateTimeText));
-  file.writeAsString(encryptedBase64);
-
-
-}
-
-
-*/
