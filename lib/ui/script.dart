@@ -47,6 +47,18 @@ class Script extends StatelessWidget {
           ),
         ],
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          //TODO our add new text code goes here
+        },
+        tooltip: "Centre FAB",
+        child: Container(
+          margin: EdgeInsets.all(15.0),
+          child: Icon(Icons.add),
+        ),
+        elevation: 4.0,
+      ),
       bottomNavigationBar: BottomAppBar(
         child: Container(
           margin: EdgeInsets.only(left: 12.0, right: 12.0),
@@ -55,24 +67,23 @@ class Script extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: <Widget>[
               IconButton(
-                //update the bottom app bar view each time an item is clicked
                 onPressed: () {
                   _tts.speak(log);
                 },
-                iconSize: 27.0,
+                iconSize: 30.0,
                 icon: Icon(
                   Icons.volume_up,
-                  color: Colors.blue.shade900,
+                  color: Colors.indigo,
                 ),
               ),
               IconButton(
                 onPressed: () {
-                  //updateTabSelection(1, "Outgoing");
+                  //TODO favorite
                 },
-                iconSize: 27.0,
+                iconSize: 30.0,
                 icon: Icon(
-                  Icons.call_made,
-                  color: Colors.blue.shade900,
+                  Icons.favorite_outline,
+                  color: Colors.indigo,
                 ),
               ),
               SizedBox(
@@ -80,22 +91,22 @@ class Script extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  // updateTabSelection(2, "Incoming");
+                  // TODO delete code goes here
                 },
-                iconSize: 27.0,
+                iconSize: 30.0,
                 icon: Icon(
-                  Icons.call_received,
-                  color: Colors.blue.shade900,
+                  Icons.delete,
+                  color: Colors.indigo,
                 ),
               ),
               IconButton(
                 onPressed: () {
-                  // updateTabSelection(3, "Settings");
+                  // TODO edit
                 },
-                iconSize: 27.0,
+                iconSize: 30.0,
                 icon: Icon(
-                  Icons.settings,
-                  color: Colors.blue.shade900,
+                  Icons.edit,
+                  color: Colors.indigo,
                 ),
               ),
             ],
