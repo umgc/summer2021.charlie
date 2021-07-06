@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import '/model/user_note.dart';
 
 import 'script.dart';
 import 'textmap.dart';
@@ -53,7 +54,8 @@ class _LoadFormState extends State<LoadForm> {
         Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Script(log: curMenu[dateTime] as String),
+              builder: (context) =>
+                  Script(userNote: curMenu[dateTime] as UserNote),
             ));
       }
     });

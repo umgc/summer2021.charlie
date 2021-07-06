@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
 
+import '/model/user_note.dart';
 import '/service/text_to_speech.dart';
 import '/util/util.dart';
 import 'load.dart';
@@ -9,12 +10,12 @@ import 'menudrawer.dart';
 ///Script file
 class Script extends StatelessWidget {
   ///Log
-  final String log;
+  final UserNote userNote;
 
   final _tts = TextToSpeech();
 
   ///Script to read
-  Script({Key key, @required this.log}) : super(key: key);
+  Script({Key key, @required this.userNote}) : super(key: key);
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -29,7 +30,7 @@ class Script extends StatelessWidget {
       body: Column(
         children: [
           TextHighlight(
-            text: log,
+            text: userNote.note,
             words: highlights,
             textStyle: const TextStyle(
                 fontSize: 32.0,
@@ -68,7 +69,7 @@ class Script extends StatelessWidget {
             children: <Widget>[
               IconButton(
                 onPressed: () {
-                  _tts.speak(log);
+                  _tts.speak(userNote.note);
                 },
                 iconSize: 30.0,
                 icon: Icon(
