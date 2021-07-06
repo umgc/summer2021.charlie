@@ -1,20 +1,65 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
 
 import '/service/text_to_speech.dart';
 import '/util/util.dart';
+import 'edit.dart';
 import 'load.dart';
 import 'menudrawer.dart';
+import 'save.dart';
+import 'textmap.dart';
 
 ///Script file
 class Script extends StatelessWidget {
-  ///Log
+  ///Log: Text of this note.
   final String log;
 
+  ///Date: Date of this note.
+  final String date;
+
+  ///Time: Time of this note.
+  final String time;
+
+  ///logMap: Map of all saved notes for deleting/editing.
+  final Map logMap;
+
   final _tts = TextToSpeech();
+  final TextMap _logs = TextMap();
 
   ///Script to read
-  Script({Key key, @required this.log}) : super(key: key);
+  Script(
+      {Key key,
+      @required this.log,
+      @required this.date,
+      @required this.time,
+      this.logMap})
+      : super(key: key);
+
+  void _deleteButtonPressed(BuildContext context) async {
+    await _logs.deleteLog(date, time);
+
+    Timer.run(() async {
+      Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (context) => Load()), (route) => false);
+    });
+  }
+
+  void _addButtonPressed(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Save()),
+    );
+  }
+
+  void _editButtonPressed(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) => Edit(log: log, date: date, time: time)),
+    );
+  }
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,7 +72,9 @@ class Script extends StatelessWidget {
       ),
       endDrawer: MenuDrawer(),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
+          Text("$date at ${time.substring(0, 5)}"),
           TextHighlight(
             text: log,
             words: highlights,
@@ -50,7 +97,7 @@ class Script extends StatelessWidget {
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          //TODO our add new text code goes here
+          _addButtonPressed(context);
         },
         tooltip: "Centre FAB",
         child: Container(
@@ -91,7 +138,7 @@ class Script extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  // TODO delete code goes here
+                  _deleteButtonPressed(context);
                 },
                 iconSize: 30.0,
                 icon: Icon(
@@ -101,7 +148,7 @@ class Script extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  // TODO edit
+                  _editButtonPressed(context);
                 },
                 iconSize: 30.0,
                 icon: Icon(
