@@ -33,6 +33,14 @@ class _SaveFormState extends State<SaveForm> {
     });
   }
 
+  void _clearButtonPressed() {
+    logs.clear();
+
+    setState(() {
+      outputText = "Save file cleared.";
+    });
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
@@ -44,11 +52,22 @@ class _SaveFormState extends State<SaveForm> {
               hintText: "Enter text to save.",
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              _buttonPressed();
-            },
-            child: Text("Save"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  _buttonPressed();
+                },
+                child: Text("Save"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _clearButtonPressed();
+                },
+                child: Text("Clear Save File"),
+              ),
+            ],
           ),
           Text(outputText),
         ],

@@ -16,6 +16,7 @@ class _LoadFormState extends State<LoadForm> {
   TextMap logs = TextMap();
   String rawText = "";
   String outputText = "";
+  String curDate = "";
   Map _decryptedJson;
   Map topMenu;
   Map curMenu;
@@ -50,12 +51,18 @@ class _LoadFormState extends State<LoadForm> {
       if (onDates) {
         onDates = false;
         curMenu = topMenu[dateTime];
+        curDate = dateTime;
       } else {
         Navigator.push(
             context,
             MaterialPageRoute(
+              TODO DODDODODDO
               builder: (context) =>
                   Script(userNote: curMenu[dateTime] as UserNote),
+              builder: (context) => Script(
+                  log: curMenu[dateTime] as String,
+                  time: dateTime,
+                  date: curDate),
             ));
       }
     });
@@ -193,7 +200,7 @@ class _LoadFormState extends State<LoadForm> {
 
             //If this is a time, the button text needs a preview
             if (!onDates) {
-              buttonName = "${buttonName.substring(0, 8)}: ";
+              buttonName = "${buttonName.substring(0, 5)}: ";
 
               //Check that the note is not shorter than 20 characters
               if (curMenu[dateTimes[i]].length < 20) {
