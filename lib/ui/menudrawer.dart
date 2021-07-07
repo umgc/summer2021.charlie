@@ -27,7 +27,7 @@ class MenuDrawer extends StatelessWidget {
           //Save Screen
           ListTile(
               leading: Icon(
-                Icons.new_label_outlined,
+                Icons.add_circle_outline,
                 size: 40,
               ),
               title: Text(
@@ -45,7 +45,7 @@ class MenuDrawer extends StatelessWidget {
           //Load Screen
           ListTile(
             leading: Icon(
-              Icons.view_headline_outlined,
+              Icons.note_alt_outlined,
               size: 40,
             ),
             title: Text(
@@ -88,15 +88,15 @@ class MenuDrawer extends StatelessWidget {
           //Home Screen
           ListTile(
               leading: Icon(
-                Icons.home_outlined,
+                Icons.mic_none_outlined,
                 size: 40,
               ),
               title: Text(
-                "Home",
-                style: TextStyle(fontSize: 20, color: Colors.grey),
+                "New Recording",
+                style: TextStyle(fontSize: 20),
               ),
-              subtitle: Text('Back to home screen',
-                  style: TextStyle(color: Colors.grey)),
+              subtitle:
+                  Text('New recording', style: TextStyle(color: Colors.grey)),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(

@@ -7,9 +7,9 @@ import 'package:google_speech/google_speech.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sound_stream/sound_stream.dart';
 
+import '/util/textmap.dart';
 import 'menudrawer.dart';
 import 'recognized_content.dart';
-import 'textmap.dart';
 
 ///AudioRecognize UI
 class AudioRecognize extends StatefulWidget {
