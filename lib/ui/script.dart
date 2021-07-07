@@ -30,10 +30,9 @@ class Script extends StatelessWidget {
   final TextMap _logs = TextMap();
 
   ///Script to read
-  Script({Key key, @required this.userNote}) : super(key: key);
   Script(
       {Key key,
-      @required this.log,
+      @required this.userNote,
       @required this.date,
       @required this.time,
       this.logMap})
@@ -59,17 +58,20 @@ class Script extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => Edit(log: log, date: date, time: time)),
+          builder: (context) =>
+              Edit(userNote: userNote, date: date, time: time)),
     );
+  }
+
+  void _favoriteButtonPressed(BuildContext context) async {
+    userNote.isFavorite = !userNote.isFavorite;
+    await _logs.changeLog(date, time, userNote);
+    (context as Element).markNeedsBuild();
   }
 
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Icon(
-          Icons.view_headline_outlined,
-          size: 40,
-        ),
         title: Text("Note"),
       ),
       endDrawer: MenuDrawer(),
@@ -78,7 +80,7 @@ class Script extends StatelessWidget {
         children: [
           Text("$date at ${time.substring(0, 5)}"),
           TextHighlight(
-            text: userNote.note,
+            text: userNote.note.trim(),
             words: highlights,
             textStyle: const TextStyle(
                 fontSize: 32.0,
@@ -127,11 +129,13 @@ class Script extends StatelessWidget {
               ),
               IconButton(
                 onPressed: () {
-                  //TODO favorite
+                  _favoriteButtonPressed(context);
                 },
                 iconSize: 30.0,
                 icon: Icon(
-                  Icons.favorite_outline,
+                  userNote != null && userNote.isFavorite
+                      ? Icons.favorite
+                      : Icons.favorite_outline,
                   color: Colors.indigo,
                 ),
               ),

@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
-import '/model/user_note.dart';
 
+import '/util/util.dart';
 import 'script.dart';
 import 'textmap.dart';
 
@@ -53,16 +53,12 @@ class _LoadFormState extends State<LoadForm> {
         curMenu = topMenu[dateTime];
         curDate = dateTime;
       } else {
+        var userNote = getUserNote(curMenu[dateTime]);
         Navigator.push(
             context,
             MaterialPageRoute(
-              TODO DODDODODDO
               builder: (context) =>
-                  Script(userNote: curMenu[dateTime] as UserNote),
-              builder: (context) => Script(
-                  log: curMenu[dateTime] as String,
-                  time: dateTime,
-                  date: curDate),
+                  Script(userNote: userNote, time: dateTime, date: curDate),
             ));
       }
     });
@@ -202,11 +198,13 @@ class _LoadFormState extends State<LoadForm> {
             if (!onDates) {
               buttonName = "${buttonName.substring(0, 5)}: ";
 
+              var mapVal = curMenu[dateTimes[i]];
+              var buttonNameVal = mapVal is String ? mapVal : mapVal["note"];
               //Check that the note is not shorter than 20 characters
-              if (curMenu[dateTimes[i]].length < 20) {
-                buttonName += curMenu[dateTimes[i]];
+              if (mapVal.length < 20) {
+                buttonName += buttonNameVal;
               } else {
-                buttonName += curMenu[dateTimes[i]].substring(0, 20);
+                buttonName += buttonNameVal.substring(0, 20);
               }
             }
 

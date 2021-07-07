@@ -4,8 +4,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-//path_provider needs to be downloaded
-//use $ flutter pub add path_provider
+import '../model/user_note.dart';
 import '../service/encryption_service.dart';
 import '../util/util.dart';
 
@@ -19,16 +18,17 @@ class TextMap {
   void addLog(String date, String time, String log) async {
     var fileText = await getDecryptedContent();
     var dateTimeText = readJson(fileText);
+    var userNote = UserNote(note: log, isFavorite: false);
     //check if current date exists in map
     if (dateTimeText.containsKey(date)) {
       //existing date
       var times = dateTimeText[date];
-      times[time] = log;
+      times[time] = userNote;
       dateTimeText[date] = times;
     } else {
       //new date
       var times = {};
-      times[time] = log;
+      times[time] = userNote;
       dateTimeText[date] = times;
     }
 
@@ -37,12 +37,12 @@ class TextMap {
   }
 
   ///Changes the log at passed date/time to the passed log
-  void changeLog(String date, String time, String log) async {
+  void changeLog(String date, String time, UserNote userNote) async {
     var fileText = await getDecryptedContent();
     var dateTimeText = readJson(fileText);
     var toChange = dateTimeText[date];
 
-    toChange[time] = log;
+    toChange[time] = userNote;
     dateTimeText[date] = toChange;
 
     //Write to file after changing log
@@ -69,7 +69,8 @@ class TextMap {
   ///Writes map to file as JSON String
   _writeFile(Map dateTimeText) async {
     var file = await getFile(mainFileName);
-    var encryptedBase64 = _encryptionService.encrypt(toJson(dateTimeText));
+    var formattedMap = getFormattedTextMap(dateTimeText);
+    var encryptedBase64 = _encryptionService.encrypt(toJson(formattedMap));
     file.writeAsString(encryptedBase64);
   }
 
