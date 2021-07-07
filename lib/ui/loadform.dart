@@ -3,9 +3,10 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+import '/util/textmap.dart';
 import '/util/util.dart';
+import 'save.dart';
 import 'script.dart';
-import 'textmap.dart';
 
 ///LoadForm
 class LoadForm extends StatefulWidget {
@@ -137,6 +138,13 @@ class _LoadFormState extends State<LoadForm> {
     return toReturn;
   }
 
+  void _addButtonPressed(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Save()),
+    );
+  }
+
   Widget build(BuildContext context) {
     //Generating list of Dates/Times for initial buttons
     var dateTimes =
@@ -148,6 +156,14 @@ class _LoadFormState extends State<LoadForm> {
     }
 
     return Scaffold(
+      floatingActionButton: FloatingActionButton(
+        child: Container(
+          child: Icon(Icons.add),
+        ),
+        onPressed: () {
+          _addButtonPressed(context);
+        },
+      ),
       body: ListView.builder(
           padding: const EdgeInsets.all(8),
           itemCount: listSize,

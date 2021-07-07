@@ -5,12 +5,12 @@ import 'package:highlight_text/highlight_text.dart';
 
 import '/model/user_note.dart';
 import '/service/text_to_speech.dart';
+import '/util/textmap.dart';
 import '/util/util.dart';
 import 'edit.dart';
 import 'load.dart';
 import 'menudrawer.dart';
 import 'save.dart';
-import 'textmap.dart';
 
 ///Script file
 class Script extends StatelessWidget {

@@ -6,7 +6,7 @@ import 'package:path_provider/path_provider.dart';
 
 import '../model/user_note.dart';
 import '../service/encryption_service.dart';
-import '../util/util.dart';
+import 'util.dart';
 
 ///Text map for the JSON
 class TextMap {

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 import '/model/user_note.dart';
+import '/util/textmap.dart';
 import 'menudrawer.dart';
 import 'script.dart';
-import 'textmap.dart';
 
 ///Edit file
 class Edit extends StatelessWidget {
