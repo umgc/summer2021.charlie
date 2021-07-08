@@ -54,12 +54,17 @@ class TextMap {
     var fileText = await getDecryptedContent();
     var dateTimeText = readJson(fileText);
 
-    //Remove the time key first
-    dateTimeText[date].remove(time);
-
-    //If the date now has no times associated, it must also be removed
-    if (dateTimeText[date].length == 0) {
+    if (time.isNullOrEmpty()) {
+      //Remove the date entry itself if the time is null
       dateTimeText.remove(date);
+    } else {
+      //Remove the time key first
+      dateTimeText[date].remove(time);
+
+      //If the date now has no times associated, it must also be removed
+      if (dateTimeText[date].length == 0) {
+        dateTimeText.remove(date);
+      }
     }
 
     //Write to file after deleting log
