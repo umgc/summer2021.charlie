@@ -55,15 +55,7 @@ jobs:
       # Build web version for code analysis.
       - name: Build Web
         run: flutter build web
-        
-      # Conduct SonarCloud code analysis on web outputs.
-      # SonarCloud, at this time, does not support Dart.
-      - name: SonarCloud Scan
-        uses: SonarSource/sonarcloud-github-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}  # Needed to get PR information, if any
-          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-     
+            
      # Upload Build Artifacts for download
       - name: 'Upload APK Artifact'
         uses: 'actions/upload-artifact@v2'

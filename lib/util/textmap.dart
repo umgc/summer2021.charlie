@@ -4,10 +4,9 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
-//path_provider needs to be downloaded
-//use $ flutter pub add path_provider
+import '../model/user_note.dart';
 import '../service/encryption_service.dart';
-import '../util/util.dart';
+import 'util.dart';
 
 ///Text map for the JSON
 class TextMap {
@@ -19,16 +18,17 @@ class TextMap {
   void addLog(String date, String time, String log) async {
     var fileText = await getDecryptedContent();
     var dateTimeText = readJson(fileText);
+    var userNote = UserNote(note: log, isFavorite: false);
     //check if current date exists in map
     if (dateTimeText.containsKey(date)) {
       //existing date
       var times = dateTimeText[date];
-      times[time] = log;
+      times[time] = userNote;
       dateTimeText[date] = times;
     } else {
       //new date
       var times = {};
-      times[time] = log;
+      times[time] = userNote;
       dateTimeText[date] = times;
     }
 
@@ -36,10 +36,41 @@ class TextMap {
     _writeFile(dateTimeText);
   }
 
-  ///Writes map to fil as JSON String
+  ///Changes the log at passed date/time to the passed log
+  void changeLog(String date, String time, UserNote userNote) async {
+    var fileText = await getDecryptedContent();
+    var dateTimeText = readJson(fileText);
+    var toChange = dateTimeText[date];
+
+    toChange[time] = userNote;
+    dateTimeText[date] = toChange;
+
+    //Write to file after changing log
+    await _writeFile(dateTimeText);
+  }
+
+  ///Deletes the log at the passed date/time from the map matrix
+  void deleteLog(String date, String time) async {
+    var fileText = await getDecryptedContent();
+    var dateTimeText = readJson(fileText);
+
+    //Remove the time key first
+    dateTimeText[date].remove(time);
+
+    //If the date now has no times associated, it must also be removed
+    if (dateTimeText[date].length == 0) {
+      dateTimeText.remove(date);
+    }
+
+    //Write to file after deleting log
+    await _writeFile(dateTimeText);
+  }
+
+  ///Writes map to file as JSON String
   _writeFile(Map dateTimeText) async {
     var file = await getFile(mainFileName);
-    var encryptedBase64 = _encryptionService.encrypt(toJson(dateTimeText));
+    var formattedMap = getFormattedTextMap(dateTimeText);
+    var encryptedBase64 = _encryptionService.encrypt(toJson(formattedMap));
     file.writeAsString(encryptedBase64);
   }
 
@@ -51,14 +82,11 @@ class TextMap {
   ///Reads the file
   //Must be called outside of textmap as init
   Future<String> readFile() async {
-    var encryptedStringBase64 = "";
-    try {
-      var file = await getFile(mainFileName);
-      encryptedStringBase64 = await file.readAsString();
-    } on Exception catch (e) {
-      print("Couldn't read file $e");
+    var file = await getFile(mainFileName);
+    if (!await file.exists()) {
+      await _writeFile({});
     }
-    return encryptedStringBase64;
+    return await file.readAsString();
   }
 
   ///Gets decrypted content

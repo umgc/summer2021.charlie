@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-import 'textmap.dart';
+import '/model/user_note.dart';
+import '/util/textmap.dart';
+import 'script.dart';
 
 ///Save form
 class SaveForm extends StatefulWidget {
@@ -29,7 +31,22 @@ class _SaveFormState extends State<SaveForm> {
 
       logs.addLog(curDate, curTime, inputText);
 
-      outputText = "$curDateTime: $inputText";
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Script(
+                userNote: UserNote(note: inputText, isFavorite: false),
+                time: curTime,
+                date: curDate),
+          ));
+    });
+  }
+
+  void _clearButtonPressed() {
+    logs.clear();
+
+    setState(() {
+      outputText = "Save file cleared.";
     });
   }
 
@@ -44,11 +61,22 @@ class _SaveFormState extends State<SaveForm> {
               hintText: "Enter text to save.",
             ),
           ),
-          ElevatedButton(
-            onPressed: () {
-              _buttonPressed();
-            },
-            child: Text("Save"),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ElevatedButton(
+                onPressed: () {
+                  _buttonPressed();
+                },
+                child: Text("Save"),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _clearButtonPressed();
+                },
+                child: Text("Clear Save File"),
+              ),
+            ],
           ),
           Text(outputText),
         ],

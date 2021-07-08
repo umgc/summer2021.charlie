@@ -1,21 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
 
-//texts to highlight
-final Map<String, HighlightedWord> _highlights = {
-  'flutter': HighlightedWord(
-      onTap: () {
-        print('Flutter');
-      },
-      textStyle:
-          const TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
-  'okay': HighlightedWord(
-      onTap: () {
-        print('okay');
-      },
-      textStyle:
-          const TextStyle(color: Colors.blue, fontWeight: FontWeight.bold)),
-};
+import '/util/util.dart';
 
 ///RecognizedContent
 class RecognizedContent extends StatelessWidget {
@@ -31,7 +17,7 @@ class RecognizedContent extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: TextHighlight(
         text: text,
-        words: _highlights,
+        words: highlights,
         textStyle: const TextStyle(
             fontSize: 32.0, color: Colors.black, fontWeight: FontWeight.w400),
       ),
