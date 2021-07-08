@@ -8,9 +8,9 @@ import '/service/text_to_speech.dart';
 import '/util/textmap.dart';
 import '/util/util.dart';
 import 'edit.dart';
-import 'load.dart';
 import 'menudrawer.dart';
 import 'save.dart';
+import 'view_notes.dart';
 
 ///Script file
 class Script extends StatelessWidget {
@@ -43,7 +43,8 @@ class Script extends StatelessWidget {
 
     Timer.run(() async {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => Load()), (route) => false);
+          MaterialPageRoute(builder: (context) => ViewNotes()),
+          (route) => false);
     });
   }
 
@@ -91,7 +92,7 @@ class Script extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => Load()),
+                MaterialPageRoute(builder: (context) => ViewNotes()),
               );
             },
             child: Text("Back"),

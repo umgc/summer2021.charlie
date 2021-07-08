@@ -9,11 +9,11 @@ import 'save.dart';
 import 'script.dart';
 
 ///LoadForm
-class LoadForm extends StatefulWidget {
-  _LoadFormState createState() => _LoadFormState();
+class ViewNotesDetail extends StatefulWidget {
+  _ViewNotesDetailState createState() => _ViewNotesDetailState();
 }
 
-class _LoadFormState extends State<LoadForm> {
+class _ViewNotesDetailState extends State<ViewNotesDetail> {
   TextMap logs = TextMap();
   String rawText = "";
   String outputText = "";
