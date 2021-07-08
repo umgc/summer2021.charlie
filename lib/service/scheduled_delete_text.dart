@@ -14,7 +14,6 @@ class ScheduledDeleteText {
 
     dateTimeText.removeWhere((key, value) {
       var dt = DateTime.parse(key);
-      //todo add isFavorites exception for deletes
       var data = json.decode(value);
       return dt.isBefore(DateTime.now().subtract(Duration(days: numberDays))) &&
           data['isFavorites'] == false;
