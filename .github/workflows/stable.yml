@@ -50,7 +50,7 @@ jobs:
         
       - name: Build APK
         run: |
-          flutter build --dart-define=GOOGLE_SERVICE_ACCOUNT_BASE64=${{secrets.GOOGLE_SERVICE_ACCOUNT_BASE64}}
+          flutter build apk --dart-define=GOOGLE_SERVICE_ACCOUNT_BASE64=${{secrets.GOOGLE_SERVICE_ACCOUNT_BASE64}}
             
      # Upload Build Artifacts for download
       - name: 'Upload APK Artifact'
