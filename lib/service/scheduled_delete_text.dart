@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import '../ui/textmap.dart';
+import '/util/textmap.dart';
 
 ///schedule delete
 class ScheduledDeleteText {
