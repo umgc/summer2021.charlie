@@ -30,12 +30,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     super.initState();
 
     Timer.run(() async {
-      var fileText = await logs.getDecryptedContent();
-      setState(() {
-        _decryptedJson = logs.readJson(fileText);
-        topMenu = _decryptedJson;
-        curMenu = _decryptedJson;
-      });
+      await _resetMapValues(true);
     });
 
     Timer.run(() async {
@@ -44,6 +39,17 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
         rawText = json.encode(rawContent);
         outputText = logs.toJson(_decryptedJson);
       });
+    });
+  }
+
+  void _resetMapValues(bool resetCurMenu) async {
+    var fileText = await logs.getDecryptedContent();
+    setState(() {
+      _decryptedJson = logs.readJson(fileText);
+      topMenu = _decryptedJson;
+      if (resetCurMenu) {
+        curMenu = _decryptedJson;
+      }
     });
   }
 
@@ -71,6 +77,18 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
 
       curMenu = topMenu;
     });
+  }
+
+  void _onSlideRightToDelete(BuildContext context, var curTime) async {
+    if (onDates) {
+      logs.deleteLog(curDate, null);
+      await _resetMapValues(true);
+    } else {
+      logs.deleteLog(curDate, curTime);
+      await _resetMapValues(false);
+      curMenu = topMenu[curTime];
+    }
+    (context as Element).markNeedsBuild();
   }
 
   void _searchButton() {
@@ -225,13 +243,56 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
             }
 
             //Normal button for date or time listing
-            return ElevatedButton(
-              onPressed: () {
-                _buttonPressed(dateTimes[i]);
+            // return ElevatedButton(
+            //   onPressed: () {
+            //     _buttonPressed(dateTimes[i]);
+            //   },
+            //   child: Text(buttonName),
+            // );
+
+            return Dismissible(
+              onDismissed: (direction) {
+                setState(() {
+                  _onSlideRightToDelete(context, dateTimes[i]);
+                });
               },
-              child: Text(buttonName),
+              secondaryBackground: Container(
+                child: Center(
+                  child: Text(
+                    'Delete',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+                color: Colors.red,
+              ),
+              background: Container(),
+              child: _noteCard(dateTimes[i]),
+              key: UniqueKey(),
+              direction: DismissDirection.endToStart,
             );
           }),
+    );
+  }
+
+  Widget _noteCard(var dateTime) {
+    return Card(
+      child: InkWell(
+        onTap: () {
+          _buttonPressed(dateTime);
+        },
+        child: Column(
+          children: <Widget>[
+            ListTile(
+              // leading: CircleAvatar(
+              //   backgroundImage: NetworkImage(movie.imageUrl),
+              // ),
+              title: Text(dateTime),
+              subtitle: Text(dateTime),
+              trailing: Text(dateTime),
+            )
+          ],
+        ),
+      ),
     );
   }
 }
