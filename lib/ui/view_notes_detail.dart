@@ -3,6 +3,8 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
+import '/model/user_note.dart';
+import '/service/local_auth_api.dart';
 import '/util/textmap.dart';
 import '/util/util.dart';
 import 'save.dart';
@@ -10,10 +12,22 @@ import 'script.dart';
 
 ///LoadForm
 class ViewNotesDetail extends StatefulWidget {
-  _ViewNotesDetailState createState() => _ViewNotesDetailState();
+  ///is favorite flag
+  final bool filterFavorite;
+
+  ///Constructor
+  ViewNotesDetail({Key key, @required this.filterFavorite}) : super(key: key);
+
+  _ViewNotesDetailState createState() =>
+      _ViewNotesDetailState(filterFavorite: filterFavorite);
 }
 
 class _ViewNotesDetailState extends State<ViewNotesDetail> {
+  ///is favorite flag
+  final bool filterFavorite;
+
+  _ViewNotesDetailState({@required this.filterFavorite});
+
   TextMap logs = TextMap();
   String rawText = "";
   String outputText = "";
@@ -45,7 +59,8 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   void _resetMapValues(bool resetCurMenu) async {
     var fileText = await logs.getDecryptedContent();
     setState(() {
-      _decryptedJson = logs.readJson(fileText);
+      _decryptedJson =
+          logs.readJson(input: fileText, filterFavorite: filterFavorite);
       topMenu = _decryptedJson;
       if (resetCurMenu) {
         curMenu = _decryptedJson;
@@ -53,20 +68,30 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     });
   }
 
-  void _buttonPressed(String dateTime) {
+  void _buttonPressed(String dateTime) async {
+    var userNote = UserNote();
+    var isFavorite = false;
+    var isAuthenticated = true;
+    if (!onDates) {
+      userNote = getUserNote(curMenu[dateTime]);
+      isFavorite = userNote != null && userNote.isFavorite;
+      isAuthenticated = isFavorite ? await LocalAuthApi.authenticate() : true;
+    }
+
     setState(() {
       if (onDates) {
         onDates = false;
         curMenu = topMenu[dateTime];
         curDate = dateTime;
       } else {
-        var userNote = getUserNote(curMenu[dateTime]);
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) =>
-                  Script(userNote: userNote, time: dateTime, date: curDate),
-            ));
+        if (isAuthenticated) {
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) =>
+                    Script(userNote: userNote, time: dateTime, date: curDate),
+              ));
+        }
       }
     });
   }
@@ -227,28 +252,28 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
 
             //Create appropriate label for upcoming button
             String buttonName = dateTimes[i];
+            String subTitle = dateTimes[i];
+            var isFavorite = false;
 
             //If this is a time, the button text needs a preview
             if (!onDates) {
               buttonName = "${buttonName.substring(0, 5)}: ";
 
               var mapVal = curMenu[dateTimes[i]];
-              var buttonNameVal = mapVal is String ? mapVal : mapVal["note"];
+              var fullNote = mapVal is String
+                  ? mapVal
+                  : (mapVal is UserNote ? mapVal.note : mapVal["note"]);
               //Check that the note is not shorter than 20 characters
-              if (mapVal.length < 20) {
-                buttonName += buttonNameVal;
-              } else {
-                buttonName += buttonNameVal.substring(0, 20);
-              }
-            }
+              subTitle =
+                  fullNote.length < 20 ? fullNote : fullNote.substring(0, 20);
+              subTitle += '...';
 
-            //Normal button for date or time listing
-            // return ElevatedButton(
-            //   onPressed: () {
-            //     _buttonPressed(dateTimes[i]);
-            //   },
-            //   child: Text(buttonName),
-            // );
+              isFavorite = mapVal is String
+                  ? false
+                  : (mapVal is UserNote
+                      ? mapVal.isFavorite
+                      : mapVal["isFavorite"]);
+            }
 
             return Dismissible(
               onDismissed: (direction) {
@@ -266,7 +291,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
                 color: Colors.red,
               ),
               background: Container(),
-              child: _noteCard(dateTimes[i]),
+              child: _noteCard(dateTimes[i], subTitle, isFavorite),
               key: UniqueKey(),
               direction: DismissDirection.endToStart,
             );
@@ -274,7 +299,9 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     );
   }
 
-  Widget _noteCard(var dateTime) {
+  Widget _noteCard(var dateTime, String subTitle, bool isFavorite) {
+    var buttonName =
+        dateTime != subTitle ? "${dateTime.substring(0, 8)}" : dateTime;
     return Card(
       child: InkWell(
         onTap: () {
@@ -283,12 +310,12 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
         child: Column(
           children: <Widget>[
             ListTile(
-              // leading: CircleAvatar(
-              //   backgroundImage: NetworkImage(movie.imageUrl),
-              // ),
-              title: Text(dateTime),
-              subtitle: Text(dateTime),
-              trailing: Text(dateTime),
+              tileColor: Theme.of(context).secondaryHeaderColor,
+              title: Text(buttonName),
+              subtitle: Text(subTitle),
+              trailing: isFavorite
+                  ? Icon(Icons.favorite, color: Theme.of(context).primaryColor)
+                  : null,
             )
           ],
         ),

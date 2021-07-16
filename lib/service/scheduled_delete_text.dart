@@ -10,7 +10,7 @@ class ScheduledDeleteText {
   /// delete
   void deleteText(int numberDays) async {
     var fileText = await logs.getDecryptedContent();
-    var dateTimeText = logs.readJson(fileText);
+    var dateTimeText = logs.readJson(input: fileText, filterFavorite: false);
 
     dateTimeText.removeWhere((key, value) {
       var dt = DateTime.parse(key);
@@ -22,4 +22,3 @@ class ScheduledDeleteText {
     logs.writeFile(dateTimeText);
   }
 }
-
