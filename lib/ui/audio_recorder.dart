@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:sound_recorder/sound_recorder.dart';
 
 import '/util/constant.dart';
+import 'audio_recognize.dart';
 
 ///Audio recorder
 class AudioRecorder extends StatefulWidget {
@@ -74,7 +75,22 @@ class _AudioRecorderState extends State<AudioRecorder> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.indigo,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
       home: Scaffold(
+        appBar: AppBar(
+          leading: Icon(
+            Icons.memory_outlined,
+            size: 40,
+          ),
+          title: Text(
+            'Mnemosyne',
+            style: TextStyle(fontSize: 25),
+          ),
+        ),
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -83,7 +99,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
               children: <Widget>[
                 !_localAudioFileExists
                     ? _buildRecordAndStopControl(context)
-                    : _buildPlayAndDelete(context),
+                    : _buildPlayAndDelete(context)
               ],
             ),
           ],
@@ -93,17 +109,37 @@ class _AudioRecorderState extends State<AudioRecorder> {
   }
 
   Widget _buildRecordAndStopControl(BuildContext context) {
-    return AvatarGlow(
-      animate: _currentStatus == RecordingStatus.Recording,
-      glowColor: Theme.of(context).primaryColor,
-      endRadius: 75.0,
-      duration: const Duration(milliseconds: 2000),
-      repeatPauseDuration: const Duration(milliseconds: 100),
-      repeat: true,
-      child: FloatingActionButton(
-          onPressed:
-              _currentStatus == RecordingStatus.Recording ? _stop : _start,
-          child: _buildIcon()),
+    return Column(
+      children: <Widget>[
+        Text(
+          'Let\'s get you all set up...',
+          style: TextStyle(color: Theme.of(context).primaryColor, fontSize: 25),
+          softWrap: true,
+        ),
+        SizedBox(height: 100),
+        Row(mainAxisAlignment: MainAxisAlignment.center, children: <Widget>[
+          AvatarGlow(
+            animate: _currentStatus == RecordingStatus.Recording,
+            glowColor: Theme.of(context).primaryColor,
+            endRadius: 75.0,
+            duration: const Duration(milliseconds: 2000),
+            repeatPauseDuration: const Duration(milliseconds: 100),
+            repeat: true,
+            child: FloatingActionButton(
+                onPressed: _currentStatus == RecordingStatus.Recording
+                    ? _stop
+                    : _start,
+                child: _buildIcon()),
+          ),
+          Text(
+            'Press the mic button...\n\nSpeak for a couple of seconds...'
+            '\n\nLet Mnemosyne recognize your voice...',
+            style:
+                TextStyle(color: Theme.of(context).primaryColor, fontSize: 15),
+            softWrap: true,
+          )
+        ])
+      ],
     );
   }
 
@@ -124,28 +160,100 @@ class _AudioRecorderState extends State<AudioRecorder> {
       default:
         break;
     }
-    return Icon(icon, color: Colors.indigo, size: 30);
+    return Icon(icon, size: 30);
   }
 
   Widget _buildPlayAndDelete(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        const SizedBox(width: 20),
-        TextButton(
-          onPressed: _onPlayAudio,
-          child: Text("Play", style: TextStyle(color: Colors.white)),
-          style: TextButton.styleFrom(
-              backgroundColor: Colors.blueAccent.withOpacity(0.5)),
-        ),
-        TextButton(
-          onPressed: _onDeleteAudio,
-          child: Text("Delete", style: TextStyle(color: Colors.white)),
-          style: TextButton.styleFrom(
-              backgroundColor: Colors.blueAccent.withOpacity(0.5)),
-        ),
-      ],
-    );
+    return Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          SizedBox(height: 100),
+          Text(
+            'How does it sound?',
+            style: TextStyle(color: Colors.indigo, fontSize: 30),
+          ),
+          SizedBox(height: 50),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              FloatingActionButton(
+                  onPressed: _onPlayAudio, child: Icon(Icons.play_arrow)),
+            ],
+          ),
+          SizedBox(height: 150),
+          Row(children: <Widget>[
+            Container(
+              constraints: BoxConstraints(maxWidth: 150.0, minHeight: 40.0),
+              margin: EdgeInsets.all(10),
+              child: ElevatedButton(
+                onPressed: _onDeleteAudio,
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(0),
+                  child: Container(
+                    alignment: Alignment.bottomLeft,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Icon(
+                          Icons.arrow_back,
+                          color: Colors.white,
+                        ),
+                        Text(
+                          'Retry',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.white,
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            Container(
+              constraints: BoxConstraints(maxWidth: 150.0, minHeight: 40.0),
+              margin: EdgeInsets.all(10),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AudioRecognize()),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                ),
+                child: Padding(
+                  padding: EdgeInsets.all(0),
+                  child: Container(
+                    alignment: Alignment.bottomRight,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Text(
+                          'Continue',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.white,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Colors.white,
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ]),
+        ]);
   }
 
   _start() async {
