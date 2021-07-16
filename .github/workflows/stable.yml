@@ -49,11 +49,8 @@ jobs:
       - run: flutter pub get
         
       - name: Build APK
-        run: flutter build apk
-      
-      # Build web version for code analysis.
-      - name: Build Web
-        run: flutter build web
+        run: |
+          flutter build apk --dart-define=GOOGLE_SERVICE_ACCOUNT_BASE64=${{secrets.GOOGLE_SERVICE_ACCOUNT_BASE64}}
             
      # Upload Build Artifacts for download
       - name: 'Upload APK Artifact'
@@ -61,13 +58,6 @@ jobs:
         with:
           name: mnemosyne-apk-${{env.FLUTTER_VERSION}}
           path: build/app/outputs/flutter-apk/*.apk
-          
-      # We can upload the web artifacts as well as it doesn't hurt.
-      - name: 'Upload Web Artifacts'
-        uses: 'actions/upload-artifact@v2'
-        with:
-          name: mnemosyne-${{env.FLUTTER_VERSION}}
-          path: build/web/**/*.*
           
   test:
     name: Run Unit Tests
