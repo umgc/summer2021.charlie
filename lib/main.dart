@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '/ui/audio_recognize.dart';
 import '/ui/audio_recorder.dart';
 import '/util/constant.dart';
 import 'service/scheduled_delete_text.dart';
