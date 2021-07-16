@@ -20,7 +20,7 @@ class MenuDrawer extends StatelessWidget {
     Navigator.pop(context);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ViewNotes()),
+      MaterialPageRoute(builder: (context) => ViewNotes(filterFavorite: false)),
     );
   }
 
@@ -30,7 +30,8 @@ class MenuDrawer extends StatelessWidget {
       Navigator.pop(context);
       Navigator.push(
         context,
-        MaterialPageRoute(builder: (context) => ViewNotes()),
+        MaterialPageRoute(
+            builder: (context) => ViewNotes(filterFavorite: true)),
       );
     }
   }

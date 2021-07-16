@@ -14,7 +14,7 @@ class TextMap {
   ///Adds log to the map matrix based on the passed date/time
   void addLog(String date, String time, String log) async {
     var fileText = await getDecryptedContent();
-    var dateTimeText = readJson(fileText);
+    var dateTimeText = readJson(input: fileText, filterFavorite: false);
     var userNote = UserNote(note: log, isFavorite: false);
     //check if current date exists in map
     if (dateTimeText.containsKey(date)) {
@@ -36,7 +36,7 @@ class TextMap {
   ///Changes the log at passed date/time to the passed log
   void changeLog(String date, String time, UserNote userNote) async {
     var fileText = await getDecryptedContent();
-    var dateTimeText = readJson(fileText);
+    var dateTimeText = readJson(input: fileText, filterFavorite: false);
     var toChange = dateTimeText[date];
 
     toChange[time] = userNote;
@@ -49,7 +49,7 @@ class TextMap {
   ///Deletes the log at the passed date/time from the map matrix
   void deleteLog(String date, String time) async {
     var fileText = await getDecryptedContent();
-    var dateTimeText = readJson(fileText);
+    var dateTimeText = readJson(input: fileText, filterFavorite: false);
 
     if (time.isNullOrEmpty()) {
       //Remove the date entry itself if the time is null
@@ -103,8 +103,28 @@ class TextMap {
   }
 
   ///Generate map from passed JSON String
-  Map readJson(String input) {
-    return input.isNotNullOrEmpty() ? json.decode(input) : {};
+  Map readJson({String input, bool filterFavorite}) {
+    var dateTimeMap = input.isNotNullOrEmpty() ? json.decode(input) : {};
+    if (filterFavorite == null || !filterFavorite) {
+      return dateTimeMap;
+    }
+
+    var filteredMap = {};
+    for (var dateKey in dateTimeMap.keys) {
+      var timeMap = dateTimeMap[dateKey];
+      if (timeMap != null) {
+        for (var timeKey in timeMap.keys) {
+          var userNote = UserNote.fromJson(timeMap[timeKey]);
+          if (userNote != null && userNote.isFavorite) {
+            var filteredTimeMap =
+                filteredMap[dateKey] != null ? filteredMap[dateKey] : {};
+            filteredTimeMap[timeKey] = userNote;
+            filteredMap[dateKey] = filteredTimeMap;
+          }
+        }
+      }
+    }
+    return filteredMap;
   }
 
   ///Converts the map to a JSON String.

@@ -43,7 +43,9 @@ class Script extends StatelessWidget {
 
     Timer.run(() async {
       Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => ViewNotes()),
+          MaterialPageRoute(
+              builder: (context) =>
+                  ViewNotes(filterFavorite: userNote.isFavorite)),
           (route) => false);
     });
   }
@@ -92,7 +94,9 @@ class Script extends StatelessWidget {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => ViewNotes()),
+                MaterialPageRoute(
+                    builder: (context) =>
+                        ViewNotes(filterFavorite: userNote.isFavorite)),
               );
             },
             child: Text("Back"),
