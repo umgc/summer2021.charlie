@@ -7,7 +7,7 @@ name: Develop Branch Linter, Build, Unit Test
 
 env:
   FLUTTER_VERSION: "debug"
-  
+
 on:
   push:
     branches: [ develop ]
@@ -25,7 +25,7 @@ jobs:
       # Setup Flutter
       - name: Set up Flutter
         uses: subosito/flutter-action@v1
-        
+
       # Add formating standards
       #- run: flutter pub add --dev effective_dart
       - run: flutter pub get
@@ -44,21 +44,28 @@ jobs:
       - uses: actions/checkout@v2
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
-      
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v1
       - run: flutter pub get
-        
+
       - name: Build APK
         run: |
           flutter build apk --dart-define=GOOGLE_SERVICE_ACCOUNT_BASE64=${{secrets.GOOGLE_SERVICE_ACCOUNT_BASE64}}
-            
-     # Upload Build Artifacts for download
+
+      # Upload Build Artifacts for download
       - name: 'Upload APK Artifact'
         uses: 'actions/upload-artifact@v2'
         with:
           name: mnemosyne-apk-${{env.FLUTTER_VERSION}}
           path: build/app/outputs/flutter-apk/*.apk
+
+      # We can upload the web artifacts as well as it doesn't hurt.
+      - name: 'Upload Web Artifacts'
+        uses: 'actions/upload-artifact@v2'
+        with:
+          name: mnemosyne-${{env.FLUTTER_VERSION}}
+          path: build/web/**/*.*
           
   test:
     name: Run Unit Tests
@@ -66,10 +73,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      
+
       - name: Set up Flutter
         uses: subosito/flutter-action@v1
       - run: flutter pub get
-      
+
       - name: Run tests
         run: flutter test
