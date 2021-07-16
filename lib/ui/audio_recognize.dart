@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:google_speech/google_speech.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sound_stream/sound_stream.dart';
 
+import '/util/constant.dart';
 import '/util/textmap.dart';
 import 'menudrawer.dart';
 import 'recognized_content.dart';
@@ -77,7 +79,16 @@ class _AudioRecognizeState extends State<AudioRecognize> {
   }
 
   void streamingRecognize() async {
+    //Initializing the stream
     _audioStream = BehaviorSubject<List<int>>();
+
+    //Getting the recorded audio file content and appending to the audiostream
+    var _fileStream = await _getAudioStream();
+    _fileStream.listen((event) {
+      _audioStream.add(event);
+    });
+
+    //Listening to the mic
     _audioStreamSubscription = _recorder.audioStream.listen((event) {
       _audioStream.add(event);
     });
@@ -120,6 +131,11 @@ class _AudioRecognizeState extends State<AudioRecognize> {
         recognizing = false;
       });
     });
+  }
+
+  Future<Stream<List<int>>> _getAudioStream() async {
+    final myAudioPath = await Constant.getAudioRecordingFilePath();
+    return File(myAudioPath).openRead();
   }
 
   String getServiceAccountJson() {
