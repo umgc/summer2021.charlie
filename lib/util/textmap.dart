@@ -30,7 +30,7 @@ class TextMap {
     }
 
     //Write to file after adding log
-    _writeFile(dateTimeText);
+    writeFile(dateTimeText);
   }
 
   ///Changes the log at passed date/time to the passed log
@@ -43,7 +43,7 @@ class TextMap {
     dateTimeText[date] = toChange;
 
     //Write to file after changing log
-    await _writeFile(dateTimeText);
+    await writeFile(dateTimeText);
   }
 
   ///Deletes the log at the passed date/time from the map matrix
@@ -60,11 +60,11 @@ class TextMap {
     }
 
     //Write to file after deleting log
-    await _writeFile(dateTimeText);
+    await writeFile(dateTimeText);
   }
 
   ///Writes map to file as JSON String
-  _writeFile(Map dateTimeText) async {
+  void writeFile(Map dateTimeText) async {
     var file = await getFile();
     var formattedMap = getFormattedTextMap(dateTimeText);
     var encryptedBase64 = _encryptionService.encrypt(toJson(formattedMap));
@@ -73,7 +73,7 @@ class TextMap {
 
   ///Clears the map and the text file
   void clear() {
-    _writeFile({});
+    writeFile({});
   }
 
   ///Reads the file
@@ -81,7 +81,7 @@ class TextMap {
   Future<String> readFile() async {
     var file = await getFile();
     if (!await file.exists()) {
-      await _writeFile({});
+      await writeFile({});
     }
     return await file.readAsString();
   }
