@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:file/local.dart';
 import 'package:flutter/material.dart';
+import 'package:google_speech/google_speech.dart';
 import 'package:sound_recorder/sound_recorder.dart';
 
 import '/util/constant.dart';
@@ -25,9 +26,13 @@ class AudioRecorder extends StatefulWidget {
 
 class _AudioRecorderState extends State<AudioRecorder> {
   SoundRecorder _recorder;
+  AudioPlayer _audioPlayer;
   Recording _current;
   RecordingStatus _currentStatus = RecordingStatus.Unset;
   bool _localAudioFileExists = false;
+  String _audioText = '';
+
+  AudioPlayerState _playerState = AudioPlayerState.COMPLETED;
 
   Future<String> get _localAudioFilePath async {
     return await Constant.getAudioRecordingFilePath();
@@ -167,20 +172,35 @@ class _AudioRecorderState extends State<AudioRecorder> {
     return Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          SizedBox(height: 100),
+          SizedBox(height: 70),
           Text(
             'How does it sound?',
             style: TextStyle(color: Colors.indigo, fontSize: 30),
           ),
-          SizedBox(height: 50),
+          SizedBox(height: 30),
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              FloatingActionButton(
-                  onPressed: _onPlayAudio, child: Icon(Icons.play_arrow)),
+              AvatarGlow(
+                animate: _playerState == AudioPlayerState.PLAYING,
+                glowColor: Theme.of(context).primaryColor,
+                endRadius: 75.0,
+                duration: const Duration(milliseconds: 1000),
+                repeatPauseDuration: const Duration(milliseconds: 50),
+                repeat: true,
+                child: FloatingActionButton(
+                    onPressed: _playerState == AudioPlayerState.PLAYING
+                        ? _onStopAudioPlayer
+                        : _onPlayAudio,
+                    child: _buildPlayerIcon()),
+              ),
             ],
           ),
-          SizedBox(height: 150),
+          SizedBox(height: 75),
+          Text(_audioText,
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor, fontSize: 20)),
+          SizedBox(height: 100),
           Row(children: <Widget>[
             Container(
               constraints: BoxConstraints(maxWidth: 150.0, minHeight: 40.0),
@@ -256,6 +276,26 @@ class _AudioRecorderState extends State<AudioRecorder> {
         ]);
   }
 
+  Widget _buildPlayerIcon() {
+    var icon;
+    switch (_playerState) {
+      case AudioPlayerState.PLAYING:
+        {
+          icon = Icons.stop;
+          break;
+        }
+      case AudioPlayerState.COMPLETED:
+      case AudioPlayerState.STOPPED:
+        {
+          icon = Icons.play_arrow;
+          break;
+        }
+      default:
+        break;
+    }
+    return Icon(icon, size: 30);
+  }
+
   _start() async {
     try {
       await _recorder.start();
@@ -288,6 +328,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
     print("Stop recording: ${result.duration}");
     var file = widget.localFileSystem.file(result.path);
     print("File length: ${await file.length()}");
+
+    await _transcribeAudioToText();
     var fileExists = await Constant.getIfFileExists(
         await Constant.getAudioRecordingFilePath());
     setState(() {
@@ -299,8 +341,28 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
   ///On play audio
   _onPlayAudio() async {
-    var audioPlayer = AudioPlayer();
-    await audioPlayer.play(_current.path, isLocal: true);
+    _audioText = '';
+    _audioPlayer = AudioPlayer();
+    await _audioPlayer.play(_current.path, isLocal: true);
+    await _transcribeAudioToText();
+    const tick = Duration(milliseconds: 5);
+    Timer.periodic(tick, (t) async {
+      setState(() {
+        _playerState = _audioPlayer.state;
+      });
+      if (_playerState == AudioPlayerState.COMPLETED) {
+        t.cancel();
+      }
+    });
+  }
+
+  ///On play audio
+  _onStopAudioPlayer() async {
+    await _audioPlayer.stop();
+
+    setState(() {
+      _playerState = _audioPlayer.state;
+    });
   }
 
   ///On Delete audio
@@ -324,4 +386,45 @@ class _AudioRecorderState extends State<AudioRecorder> {
       });
     }
   }
+
+  void _transcribeAudioToText() async {
+    final speechToText = Constant.getSpeechToTextService();
+    final config = _getConfig();
+
+    final responseStream = speechToText.streamingRecognize(
+        StreamingRecognitionConfig(config: config, interimResults: true),
+        await await Constant().getAudioStream());
+
+    responseStream.listen((data) {
+      setState(() {
+        _audioText =
+            data.results.map((e) => e.alternatives.first.transcript).join('\n');
+      });
+    }, onDone: () {
+      setState(() {
+        _saveAudioTextFile(_audioText);
+      });
+    });
+  }
+
+  void _saveAudioTextFile(String audioText) async {
+    var file = File(await Constant.getAudioTextFilePath());
+    file.writeAsString(audioText);
+  }
+
+  /*void _readFile() async {
+    var file = File(await Constant.getAudioTextFilePath());
+    if (!await file.exists()) {
+      await _saveAudioTextFile('');
+    }
+
+    var audioText = await file.readAsString();
+  }*/
+
+  RecognitionConfig _getConfig() => RecognitionConfig(
+      encoding: AudioEncoding.LINEAR16,
+      model: RecognitionModel.basic,
+      enableAutomaticPunctuation: true,
+      sampleRateHertz: 16000,
+      languageCode: 'en-US');
 }

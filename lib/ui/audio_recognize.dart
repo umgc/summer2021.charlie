@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
@@ -83,7 +81,7 @@ class _AudioRecognizeState extends State<AudioRecognize> {
     _audioStream = BehaviorSubject<List<int>>();
 
     //Getting the recorded audio file content and appending to the audiostream
-    var _fileStream = await _getAudioStream();
+    var _fileStream = await Constant().getAudioStream();
     _fileStream.listen((event) {
       _audioStream.add(event);
     });
@@ -99,8 +97,7 @@ class _AudioRecognizeState extends State<AudioRecognize> {
       recognizing = true;
     });
 
-    final serviceAccount = ServiceAccount.fromString(getServiceAccountJson());
-    final speechToText = SpeechToText.viaServiceAccount(serviceAccount);
+    final speechToText = Constant.getSpeechToTextService();
     final config = _getConfig();
 
     final responseStream = speechToText.streamingRecognize(
@@ -131,18 +128,6 @@ class _AudioRecognizeState extends State<AudioRecognize> {
         recognizing = false;
       });
     });
-  }
-
-  Future<Stream<List<int>>> _getAudioStream() async {
-    final myAudioPath = await Constant.getAudioRecordingFilePath();
-    return File(myAudioPath).openRead();
-  }
-
-  String getServiceAccountJson() {
-    const base64String =
-        String.fromEnvironment('GOOGLE_SERVICE_ACCOUNT_BASE64');
-    var base64Converter = utf8.fuse(base64);
-    return base64Converter.decode(base64String);
   }
 
   void _saveText() {
