@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'menudrawer.dart';
+import 'settingsform.dart';
 
 ///Settings page
 class Settings extends StatelessWidget {
@@ -10,7 +11,7 @@ class Settings extends StatelessWidget {
         title: Text("Settings"),
       ),
       endDrawer: MenuDrawer(),
-      body: Text("Settings Screen"),
+      body: SettingsForm(),
     );
   }
 }

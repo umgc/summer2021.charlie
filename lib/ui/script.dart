@@ -5,6 +5,7 @@ import 'package:highlight_text/highlight_text.dart';
 
 import '/model/user_note.dart';
 import '/service/text_to_speech.dart';
+import '/util/settingsloader.dart';
 import '/util/textmap.dart';
 import '/util/util.dart';
 import 'edit.dart';
@@ -26,8 +27,12 @@ class Script extends StatelessWidget {
   ///logMap: Map of all saved notes for deleting/editing.
   final Map logMap;
 
+  ///textSize: Size of text for the script page.
+  final double textSize;
+
   final _tts = TextToSpeech();
   final TextMap _logs = TextMap();
+  final SettingsLoader _settingsLoader = SettingsLoader();
 
   ///Script to read
   Script(
@@ -35,6 +40,7 @@ class Script extends StatelessWidget {
       @required this.userNote,
       @required this.date,
       @required this.time,
+      @required this.textSize,
       this.logMap})
       : super(key: key);
 
@@ -61,8 +67,11 @@ class Script extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) =>
-              Edit(userNote: userNote, date: date, time: time)),
+          builder: (context) => Edit(
+              userNote: userNote,
+              date: date,
+              time: time,
+              textSize: (textSize / 2))),
     );
   }
 
@@ -81,12 +90,13 @@ class Script extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Text("$date at ${time.substring(0, 5)}"),
+          Text("$date at ${time.substring(0, 5)}",
+              style: _settingsLoader.getStyle(textSize / 2)),
           TextHighlight(
             text: userNote.note.trim(),
             words: highlights,
-            textStyle: const TextStyle(
-                fontSize: 32.0,
+            textStyle: TextStyle(
+                fontSize: textSize,
                 color: Colors.black,
                 fontWeight: FontWeight.w400),
           ),
