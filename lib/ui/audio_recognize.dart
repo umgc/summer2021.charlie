@@ -1,7 +1,10 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
+import 'package:google_speech/generated/google/cloud/speech/v1/cloud_speech.pb.dart'
+    as _cs;
 import 'package:google_speech/google_speech.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:sound_stream/sound_stream.dart';
@@ -31,7 +34,6 @@ class _AudioRecognizeState extends State<AudioRecognize> {
   @override
   void initState() {
     super.initState();
-
     _recorder.initialize();
   }
 
@@ -77,6 +79,9 @@ class _AudioRecognizeState extends State<AudioRecognize> {
   }
 
   void streamingRecognize() async {
+    //Get the user recorded text
+    var _userRecordedAudioText = await _getRecordedTextFile();
+
     //Initializing the stream
     _audioStream = BehaviorSubject<List<int>>();
 
@@ -104,18 +109,26 @@ class _AudioRecognizeState extends State<AudioRecognize> {
         StreamingRecognitionConfig(config: config, interimResults: true),
         _audioStream);
 
-    var responseText = '';
+    var responseText = 'START ---->$_userRecordedAudioText<---- END';
 
     responseStream.listen((data) {
-      final currentText =
-          data.results.map((e) => e.alternatives.first.transcript).join('\n');
+      var currentText = '';
 
       if (data.results.first.isFinal) {
+        for (var alt in data.results.first.alternatives) {
+          for (var word in alt.words) {
+            print(word.speakerTag);
+            if (word.speakerTag == 1) {
+              currentText += currentText.isNotEmpty ? ' ' : '';
+              currentText += word.word;
+            }
+          }
+        }
         responseText += '\n$currentText';
+        _saveText();
         setState(() {
           _text = responseText;
           recognizeFinished = true;
-          _saveText();
         });
       } else {
         setState(() {
@@ -128,6 +141,11 @@ class _AudioRecognizeState extends State<AudioRecognize> {
         recognizing = false;
       });
     });
+  }
+
+  Future<String> _getRecordedTextFile() async {
+    var audioTextFile = File(await Constant.getAudioTextFilePath());
+    return await audioTextFile.readAsString();
   }
 
   void _saveText() {
@@ -151,10 +169,18 @@ class _AudioRecognizeState extends State<AudioRecognize> {
     });
   }
 
-  RecognitionConfig _getConfig() => RecognitionConfig(
-      encoding: AudioEncoding.LINEAR16,
-      model: RecognitionModel.basic,
-      enableAutomaticPunctuation: true,
-      sampleRateHertz: 16000,
-      languageCode: 'en-US');
+  RecognitionConfig _getConfig() {
+    var diarizationConfig = _cs.SpeakerDiarizationConfig();
+    diarizationConfig.enableSpeakerDiarization = true;
+    diarizationConfig.maxSpeakerCount = 1;
+    diarizationConfig.maxSpeakerCount = 5;
+
+    return RecognitionConfig(
+        encoding: AudioEncoding.LINEAR16,
+        model: RecognitionModel.basic,
+        enableAutomaticPunctuation: true,
+        sampleRateHertz: 16000,
+        languageCode: 'en-US',
+        diarizationConfig: diarizationConfig);
+  }
 }

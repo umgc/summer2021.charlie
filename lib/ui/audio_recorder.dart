@@ -343,7 +343,11 @@ class _AudioRecorderState extends State<AudioRecorder> {
   _onPlayAudio() async {
     _audioText = '';
     _audioPlayer = AudioPlayer();
-    await _audioPlayer.play(_current.path, isLocal: true);
+    await _audioPlayer.play(
+        _current != null
+            ? _current.path
+            : await Constant.getAudioRecordingFilePath(),
+        isLocal: true);
     await _transcribeAudioToText();
     const tick = Duration(milliseconds: 5);
     Timer.periodic(tick, (t) async {
