@@ -5,10 +5,12 @@ import 'package:flutter/material.dart';
 
 import '/model/user_note.dart';
 import '/service/local_auth_api.dart';
+import '/util/settingsloader.dart';
 import '/util/textmap.dart';
 import '/util/util.dart';
 import 'save.dart';
 import 'script.dart';
+import 'view_notes.dart';
 
 ///LoadForm
 class ViewNotesDetail extends StatefulWidget {
@@ -29,6 +31,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   _ViewNotesDetailState({@required this.filterFavorite});
 
   TextMap logs = TextMap();
+  SettingsLoader settingsLoader = SettingsLoader();
   String rawText = "";
   String outputText = "";
   String curDate = "";
@@ -37,14 +40,21 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   Map curMenu;
   bool onDates = true;
   bool onSearch = false;
+  double textSize = 12.0;
   final textController = TextEditingController();
 
-  //Attempt to load file as this screen opens
+  //Attempt to load files as this screen opens
   void initState() {
     super.initState();
 
+    //Prepare locally stored data and settings
     Timer.run(() async {
       await _resetMapValues(true);
+      var settingsList = await settingsLoader.readFile();
+
+      setState(() {
+        textSize = settingsList[0];
+      });
     });
 
     Timer.run(() async {
@@ -88,8 +98,11 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                builder: (context) =>
-                    Script(userNote: userNote, time: dateTime, date: curDate),
+                builder: (context) => Script(
+                    userNote: userNote,
+                    time: dateTime,
+                    date: curDate,
+                    textSize: textSize * 2),
               ));
         }
       }
@@ -105,15 +118,29 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   }
 
   void _onSlideRightToDelete(BuildContext context, var curTime) async {
+    /*
     if (onDates) {
-      logs.deleteLog(curDate, null);
+      await logs.deleteLog(curDate, null);
       await _resetMapValues(true);
     } else {
-      logs.deleteLog(curDate, curTime);
+      await logs.deleteLog(curDate, curTime);
       await _resetMapValues(false);
+
       curMenu = topMenu[curTime];
     }
     (context as Element).markNeedsBuild();
+    */
+
+    if (!onDates) {
+      await logs.deleteLog(curDate, curTime);
+
+      Timer.run(() async {
+        Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(
+                builder: (context) => ViewNotes(filterFavorite: false)),
+            (route) => false);
+      });
+    }
   }
 
   void _searchButton() {
@@ -144,13 +171,13 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
 
           //Loop through each time for this date.
           for (var t = 0; t < times.length; t++) {
-            String curLog = curDate[times[t]].trim().toLowerCase();
+            var uNote = getUserNote(curDate[times[t]]);
+            var curLog = uNote != null ? uNote.note.trim().toLowerCase() : null;
 
             //Check if this log has the search term
             if (curLog.contains(searchTerm)) {
-              //Search term found, add this date/time/log to toReturn
-              toReturn =
-                  _addLog(dates[d], times[t], curDate[times[t]], toReturn);
+              //Search term found, add this date/time/note to toReturn
+              toReturn = _addLog(dates[d], times[t], uNote, toReturn);
             }
           }
         }
@@ -163,18 +190,18 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   }
 
   //Helper method: Adds a log for the passed date/time to the passed Map
-  Map _addLog(String date, String time, String log, Map toAdd) {
+  Map _addLog(String date, String time, UserNote note, Map toAdd) {
     var toReturn = toAdd;
     //Check if current date exists in map
     if (toReturn.containsKey(date)) {
       //Existing date
       var times = toReturn[date];
-      times[time] = log;
+      times[time] = note;
       toReturn[date] = times;
     } else {
       //New date
       var times = {};
-      times[time] = log;
+      times[time] = note;
       toReturn[date] = times;
     }
 
@@ -215,6 +242,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
             //Search field for dates list
             if (onDates && i == listSize - 2 && !onSearch) {
               return TextField(
+                style: settingsLoader.getStyle(textSize),
                 controller: textController,
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
@@ -235,7 +263,8 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
                 onPressed: () {
                   _searchButton();
                 },
-                child: Text(searchText),
+                child:
+                    Text(searchText, style: settingsLoader.getStyle(textSize)),
               );
             }
 
@@ -246,7 +275,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
                 onPressed: () {
                   _backButton();
                 },
-                child: Text("Back"),
+                child: Text("Back", style: settingsLoader.getStyle(textSize)),
               );
             }
 
@@ -311,8 +340,9 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
           children: <Widget>[
             ListTile(
               tileColor: Theme.of(context).secondaryHeaderColor,
-              title: Text(buttonName),
-              subtitle: Text(subTitle),
+              title: Text(buttonName, style: settingsLoader.getStyle(textSize)),
+              subtitle:
+                  Text(subTitle, style: settingsLoader.getStyle(textSize)),
               trailing: isFavorite
                   ? Icon(Icons.favorite, color: Theme.of(context).primaryColor)
                   : null,
