@@ -39,11 +39,6 @@ class Constant {
     return [14.0, 7];
   }
 
-  static Future<String> _getFilePath(String fileName) async {
-    final directory = await getApplicationDocumentsDirectory();
-    return '${'${directory.path}/'}$fileName';
-  }
-
   ///Get speech to text service by the json file
   static SpeechToText getSpeechToTextService() {
     final serviceAccount = ServiceAccount.fromString(_getServiceAccountJson());
@@ -56,10 +51,21 @@ class Constant {
     return File(myAudioPath).openRead();
   }
 
+  ///Delete file
+  static void deleteFile(String filePath) async {
+    var file = File('$filePath');
+    await file.delete();
+  }
+
   static String _getServiceAccountJson() {
     const base64String =
         String.fromEnvironment('GOOGLE_SERVICE_ACCOUNT_BASE64');
     var base64Converter = utf8.fuse(base64);
     return base64Converter.decode(base64String);
+  }
+
+  static Future<String> _getFilePath(String fileName) async {
+    final directory = await getApplicationDocumentsDirectory();
+    return '${'${directory.path}/'}$fileName';
   }
 }

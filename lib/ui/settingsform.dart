@@ -2,7 +2,9 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '/util/constant.dart';
 import '/util/settingsloader.dart';
+import 'audio_recorder.dart';
 import 'settings.dart';
 
 ///Settings Form
@@ -51,6 +53,24 @@ class _SettingsFormState extends State<SettingsForm> {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => Settings()),
+    );
+  }
+
+  void _deleteAllTexts() async {
+    await Constant.deleteFile(await Constant.getTextFilePath());
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Settings()),
+    );
+  }
+
+  _reRecordUsersVoice() async {
+    await Constant.deleteFile(await Constant.getAudioRecordingFilePath());
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AudioRecorder()),
     );
   }
 
@@ -104,6 +124,20 @@ class _SettingsFormState extends State<SettingsForm> {
                   _saveChangesPressed();
                 },
                 child: Text("Save Changes",
+                    style: settingsLoader.getStyle(textSize)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _deleteAllTexts();
+                },
+                child: Text("Delete All Texts",
+                    style: settingsLoader.getStyle(textSize)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _reRecordUsersVoice();
+                },
+                child: Text("Re-record User's Voice",
                     style: settingsLoader.getStyle(textSize)),
               ),
             ],
