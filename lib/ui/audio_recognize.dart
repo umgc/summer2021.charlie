@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:avatar_glow/avatar_glow.dart';
 import 'package:flutter/material.dart';
@@ -79,9 +78,6 @@ class _AudioRecognizeState extends State<AudioRecognize> {
   }
 
   void streamingRecognize() async {
-    //Get the user recorded text
-    var _userRecordedAudioText = await _getRecordedTextFile();
-
     //Initializing the stream
     _audioStream = BehaviorSubject<List<int>>();
 
@@ -109,43 +105,40 @@ class _AudioRecognizeState extends State<AudioRecognize> {
         StreamingRecognitionConfig(config: config, interimResults: true),
         _audioStream);
 
-    var responseText = 'START ---->$_userRecordedAudioText<---- END';
-
+    var responseText = '';
+    var previousWordLength = 0;
     responseStream.listen((data) {
-      var currentText = '';
+      if (recognizing) {
+        var currentText = '';
 
-      if (data.results.first.isFinal) {
-        for (var alt in data.results.first.alternatives) {
-          for (var word in alt.words) {
-            print(word.speakerTag);
-            if (word.speakerTag == 1) {
+        if (data.results.first.isFinal) {
+          var alt = data.results.first.alternatives[0];
+          for (var i = 0; i < alt.words.length; i++) {
+            if (i >= previousWordLength) {
+              var word = alt.words[i];
+              print(
+                  '---> Speaker tag: ${word.speakerTag} -- Word: ${word.word}');
+              // if (word.speakerTag == 1) {
               currentText += currentText.isNotEmpty ? ' ' : '';
               currentText += word.word;
+              // }
             }
           }
+          previousWordLength = alt.words.length;
+
+          responseText += '\n$currentText';
+          setState(() {
+            _text = responseText;
+            recognizeFinished = true;
+          });
+          _saveText();
         }
-        responseText += '\n$currentText';
-        _saveText();
-        setState(() {
-          _text = responseText;
-          recognizeFinished = true;
-        });
-      } else {
-        setState(() {
-          _text = '$responseText\n$currentText';
-          recognizeFinished = true;
-        });
       }
     }, onDone: () {
       setState(() {
         recognizing = false;
       });
     });
-  }
-
-  Future<String> _getRecordedTextFile() async {
-    var audioTextFile = File(await Constant.getAudioTextFilePath());
-    return await audioTextFile.readAsString();
   }
 
   void _saveText() {

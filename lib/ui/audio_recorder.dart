@@ -397,7 +397,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
     final responseStream = speechToText.streamingRecognize(
         StreamingRecognitionConfig(config: config, interimResults: true),
-        await await Constant().getAudioStream());
+        await Constant().getAudioStream());
 
     responseStream.listen((data) {
       setState(() {

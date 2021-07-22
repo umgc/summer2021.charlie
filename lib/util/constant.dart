@@ -39,7 +39,7 @@ class Constant {
 
   ///Get audio stream
   Future<Stream<List<int>>> getAudioStream() async {
-    final myAudioPath = await Constant.getAudioRecordingFilePath();
+    final myAudioPath = await getAudioRecordingFilePath();
     return File(myAudioPath).openRead();
   }
 
