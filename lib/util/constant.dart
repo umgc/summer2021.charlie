@@ -26,6 +26,19 @@ class Constant {
     return await _getFilePath('memory.txt');
   }
 
+  ///Get file path for settings file
+  static Future<String> getSettingsFilePath() async {
+    return await _getFilePath('memorySettings.txt');
+  }
+
+  ///Returns List of default settings
+  static List getDefaultSettings() {
+    //Current Defaults:
+    //Text Size: 12.0
+    //Days: 7
+    return [14.0, 7];
+  }
+
   static Future<String> _getFilePath(String fileName) async {
     final directory = await getApplicationDocumentsDirectory();
     return '${'${directory.path}/'}$fileName';

@@ -17,6 +17,10 @@ class Edit extends StatelessWidget {
 
   ///Time: Time of this note.
   final String time;
+
+  ///textSize: Size of the text
+  final double textSize;
+
   final _textController = TextEditingController();
 
   void _saveButtonPressed(BuildContext context) async {
@@ -27,8 +31,11 @@ class Edit extends StatelessWidget {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              Script(userNote: editedUserNote, time: time, date: date),
+          builder: (context) => Script(
+              userNote: editedUserNote,
+              time: time,
+              date: date,
+              textSize: textSize),
         ));
   }
 
@@ -46,7 +53,8 @@ class Edit extends StatelessWidget {
       {Key key,
       @required this.userNote,
       @required this.date,
-      @required this.time})
+      @required this.time,
+      @required this.textSize})
       : super(key: key);
 
   Widget build(BuildContext context) {
