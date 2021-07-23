@@ -23,7 +23,7 @@ class Edit extends StatelessWidget {
   final double textSize;
 
   final _textController = TextEditingController();
-  SettingsLoader settingsLoader = SettingsLoader();
+  final SettingsLoader _settingsLoader = SettingsLoader();
 
   void _saveButtonPressed(BuildContext context) async {
     var editedUserNote =
@@ -73,7 +73,7 @@ class Edit extends StatelessWidget {
       body: Column(
         children: [
           TextField(
-            style: settingsLoader.getStyle(textSize),
+            style: _settingsLoader.getStyle(textSize),
             controller: _textController,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -87,13 +87,14 @@ class Edit extends StatelessWidget {
                 onPressed: () {
                   _saveButtonPressed(context);
                 },
-                child: Text("Save", style: settingsLoader.getStyle(textSize)),
+                child: Text("Save", style: _settingsLoader.getStyle(textSize)),
               ),
               ElevatedButton(
                 onPressed: () {
                   _cancelButtonPressed(context);
                 },
-                child: Text("Cancel", style: settingsLoader.getStyle(textSize)),
+                child:
+                    Text("Cancel", style: _settingsLoader.getStyle(textSize)),
               ),
             ],
           ),
