@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/model/user_note.dart';
+import '/util/settingsloader.dart';
 import '/util/textmap.dart';
 import 'menudrawer.dart';
 import 'script.dart';
@@ -17,7 +18,12 @@ class Edit extends StatelessWidget {
 
   ///Time: Time of this note.
   final String time;
+
+  ///textSize: Size of the text
+  final double textSize;
+
   final _textController = TextEditingController();
+  final SettingsLoader _settingsLoader = SettingsLoader();
 
   void _saveButtonPressed(BuildContext context) async {
     var editedUserNote =
@@ -27,8 +33,11 @@ class Edit extends StatelessWidget {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              Script(userNote: editedUserNote, time: time, date: date),
+          builder: (context) => Script(
+              userNote: editedUserNote,
+              time: time,
+              date: date,
+              textSize: textSize * 2),
         ));
   }
 
@@ -36,8 +45,11 @@ class Edit extends StatelessWidget {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              Script(userNote: userNote, time: time, date: date),
+          builder: (context) => Script(
+              userNote: userNote,
+              time: time,
+              date: date,
+              textSize: textSize * 2),
         ));
   }
 
@@ -46,7 +58,8 @@ class Edit extends StatelessWidget {
       {Key key,
       @required this.userNote,
       @required this.date,
-      @required this.time})
+      @required this.time,
+      @required this.textSize})
       : super(key: key);
 
   Widget build(BuildContext context) {
@@ -60,6 +73,7 @@ class Edit extends StatelessWidget {
       body: Column(
         children: [
           TextField(
+            style: _settingsLoader.getStyle(textSize),
             controller: _textController,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -73,13 +87,14 @@ class Edit extends StatelessWidget {
                 onPressed: () {
                   _saveButtonPressed(context);
                 },
-                child: Text("Save"),
+                child: Text("Save", style: _settingsLoader.getStyle(textSize)),
               ),
               ElevatedButton(
                 onPressed: () {
                   _cancelButtonPressed(context);
                 },
-                child: Text("Cancel"),
+                child:
+                    Text("Cancel", style: _settingsLoader.getStyle(textSize)),
               ),
             ],
           ),

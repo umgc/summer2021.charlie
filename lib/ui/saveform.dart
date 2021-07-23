@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '/model/user_note.dart';
+import '/util/settingsloader.dart';
 import '/util/textmap.dart';
 import 'script.dart';
 
@@ -13,6 +16,23 @@ class _SaveFormState extends State<SaveForm> {
   final textController = TextEditingController();
   String outputText = '';
   TextMap logs = TextMap();
+  SettingsLoader settingsLoader = SettingsLoader();
+  double textSize = 14.0;
+  bool isLoading = true;
+
+  void initState() {
+    super.initState();
+
+    //Load settings file
+    Timer.run(() async {
+      var settingsList = await settingsLoader.readFile();
+
+      setState(() {
+        textSize = settingsList[0];
+        isLoading = false;
+      });
+    });
+  }
 
   @override
   void dispose() {
@@ -37,28 +57,35 @@ class _SaveFormState extends State<SaveForm> {
             builder: (context) => Script(
                 userNote: UserNote(note: inputText, isFavorite: false),
                 time: curTime,
-                date: curDate),
+                date: curDate,
+                textSize: (textSize * 2)),
           ));
     });
   }
 
-  void _clearButtonPressed() {
-    logs.clear();
-
-    setState(() {
-      outputText = "Save file cleared.";
-    });
-  }
-
   Widget build(BuildContext context) {
+    if (isLoading) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
       body: Column(
         children: [
-          TextField(
-            controller: textController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "Enter text to save.",
+          SizedBox(height: 10),
+          Container(
+            width: 400.0,
+            child: TextField(
+              style: TextStyle(fontSize: textSize, height: 1.5),
+              controller: textController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: "Enter text to save.",
+              ),
+              maxLines: 4,
             ),
           ),
           Row(
@@ -68,13 +95,7 @@ class _SaveFormState extends State<SaveForm> {
                 onPressed: () {
                   _buttonPressed();
                 },
-                child: Text("Save"),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _clearButtonPressed();
-                },
-                child: Text("Clear Save File"),
+                child: Text("Save", style: settingsLoader.getStyle(textSize)),
               ),
             ],
           ),
