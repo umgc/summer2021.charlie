@@ -31,6 +31,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
   RecordingStatus _currentStatus = RecordingStatus.Unset;
   bool _localAudioFileExists = false;
   String _audioText = '';
+  Timer _timer;
 
   AudioPlayerState _playerState = AudioPlayerState.COMPLETED;
 
@@ -238,13 +239,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
               constraints: BoxConstraints(maxWidth: 150.0, minHeight: 40.0),
               margin: EdgeInsets.all(10),
               child: ElevatedButton(
-                onPressed: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => AudioRecognize()),
-                  );
-                },
+                onPressed: _onContinue,
                 style: ElevatedButton.styleFrom(
                   primary: Theme.of(context).primaryColor,
                 ),
@@ -350,7 +345,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
         isLocal: true);
     await _transcribeAudioToText();
     const tick = Duration(milliseconds: 5);
-    Timer.periodic(tick, (t) async {
+    _timer = Timer.periodic(tick, (t) async {
       setState(() {
         _playerState = _audioPlayer.state;
       });
@@ -366,7 +361,20 @@ class _AudioRecorderState extends State<AudioRecorder> {
 
     setState(() {
       _playerState = _audioPlayer.state;
+      _timer.cancel();
     });
+  }
+
+  ///On continue
+  void _onContinue() {
+    if (_timer != null) {
+      _timer.cancel();
+    }
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => AudioRecognize()),
+    );
   }
 
   ///On Delete audio

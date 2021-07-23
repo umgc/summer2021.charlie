@@ -118,6 +118,7 @@ class _AudioRecognizeState extends State<AudioRecognize> {
               var word = alt.words[i];
               print(
                   '---> Speaker tag: ${word.speakerTag} -- Word: ${word.word}');
+              //todo remove for the final release
               // if (word.speakerTag == 1) {
               currentText += currentText.isNotEmpty ? ' ' : '';
               currentText += word.word;
