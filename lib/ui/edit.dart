@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '/model/user_note.dart';
+import '/util/settingsloader.dart';
 import '/util/textmap.dart';
 import 'menudrawer.dart';
 import 'script.dart';
@@ -22,6 +23,7 @@ class Edit extends StatelessWidget {
   final double textSize;
 
   final _textController = TextEditingController();
+  SettingsLoader settingsLoader = SettingsLoader();
 
   void _saveButtonPressed(BuildContext context) async {
     var editedUserNote =
@@ -35,7 +37,7 @@ class Edit extends StatelessWidget {
               userNote: editedUserNote,
               time: time,
               date: date,
-              textSize: textSize),
+              textSize: textSize * 2),
         ));
   }
 
@@ -43,8 +45,11 @@ class Edit extends StatelessWidget {
     Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) =>
-              Script(userNote: userNote, time: time, date: date),
+          builder: (context) => Script(
+              userNote: userNote,
+              time: time,
+              date: date,
+              textSize: textSize * 2),
         ));
   }
 
@@ -68,6 +73,7 @@ class Edit extends StatelessWidget {
       body: Column(
         children: [
           TextField(
+            style: settingsLoader.getStyle(textSize),
             controller: _textController,
             decoration: InputDecoration(
               border: OutlineInputBorder(),
@@ -81,13 +87,13 @@ class Edit extends StatelessWidget {
                 onPressed: () {
                   _saveButtonPressed(context);
                 },
-                child: Text("Save"),
+                child: Text("Save", style: settingsLoader.getStyle(textSize)),
               ),
               ElevatedButton(
                 onPressed: () {
                   _cancelButtonPressed(context);
                 },
-                child: Text("Cancel"),
+                child: Text("Cancel", style: settingsLoader.getStyle(textSize)),
               ),
             ],
           ),
