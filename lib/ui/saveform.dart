@@ -63,14 +63,6 @@ class _SaveFormState extends State<SaveForm> {
     });
   }
 
-  void _clearButtonPressed() {
-    logs.clear();
-
-    setState(() {
-      outputText = "Save file cleared.";
-    });
-  }
-
   Widget build(BuildContext context) {
     if (isLoading) {
       return Scaffold(
@@ -83,12 +75,17 @@ class _SaveFormState extends State<SaveForm> {
     return Scaffold(
       body: Column(
         children: [
-          TextField(
-            style: settingsLoader.getStyle(textSize),
-            controller: textController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "Enter text to save.",
+          SizedBox(height: 10),
+          Container(
+            width: 400.0,
+            child: TextField(
+              style: TextStyle(fontSize: textSize, height: 1.5),
+              controller: textController,
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+                hintText: "Enter text to save.",
+              ),
+              maxLines: 4,
             ),
           ),
           Row(
