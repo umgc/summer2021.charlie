@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '/util/constant.dart';
 import '/util/settingsloader.dart';
+import '/util/textmap.dart';
 import 'audio_recorder.dart';
 import 'settings.dart';
 
@@ -18,6 +19,7 @@ class _SettingsFormState extends State<SettingsForm> {
   var _daysSliderValue = 7.0;
   List settingsList = [14.0, 7];
   SettingsLoader settingsLoader = SettingsLoader();
+  TextMap logs = TextMap();
   double textSize = 14.0;
 
   //Attempt to load settings file as this screen opens.
@@ -49,6 +51,15 @@ class _SettingsFormState extends State<SettingsForm> {
 
   void _resetSettingsPressed() {
     settingsLoader.resetSettings();
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => Settings()),
+    );
+  }
+
+  void _clearButtonPressed() async {
+    await logs.clear();
 
     Navigator.push(
       context,
@@ -117,6 +128,13 @@ class _SettingsFormState extends State<SettingsForm> {
                   _resetSettingsPressed();
                 },
                 child: Text("Reset Settings",
+                    style: settingsLoader.getStyle(textSize)),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  _clearButtonPressed();
+                },
+                child: Text("Clear Notes File",
                     style: settingsLoader.getStyle(textSize)),
               ),
               ElevatedButton(

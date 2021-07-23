@@ -100,13 +100,6 @@ class _SaveFormState extends State<SaveForm> {
                 },
                 child: Text("Save", style: settingsLoader.getStyle(textSize)),
               ),
-              ElevatedButton(
-                onPressed: () {
-                  _clearButtonPressed();
-                },
-                child: Text("Clear Save File",
-                    style: settingsLoader.getStyle(textSize)),
-              ),
             ],
           ),
           Text(outputText),
