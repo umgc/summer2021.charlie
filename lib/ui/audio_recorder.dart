@@ -65,8 +65,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
           print(_currentStatus);
         });
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("You must accept permissions")));
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Restart the application")));
       }
     } on Exception catch (e) {
       print(e);
@@ -115,6 +115,20 @@ class _AudioRecorderState extends State<AudioRecorder> {
   }
 
   Widget _buildRecordAndStopControl(BuildContext context) {
+    if (_currentStatus == RecordingStatus.Unset) {
+      return Container(
+          padding: const EdgeInsets.all(16.0),
+          width: 400.0,
+          child: Center(
+            child: Text(
+              'Please, restart the app to get the mic activated...',
+              maxLines: 5,
+              style: TextStyle(
+                  color: Theme.of(context).primaryColor, fontSize: 25),
+              softWrap: true,
+            ),
+          ));
+    }
     return Column(
       children: <Widget>[
         Text(
@@ -161,6 +175,11 @@ class _AudioRecorderState extends State<AudioRecorder> {
       case RecordingStatus.Stopped:
         {
           icon = Icons.mic;
+          break;
+        }
+      case RecordingStatus.Unset:
+        {
+          icon = Icons.close;
           break;
         }
       default:
