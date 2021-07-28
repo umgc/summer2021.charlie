@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:highlight_text/highlight_text.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '/model/user_note.dart';
+import 'constant.dart';
 
 ///String extension
 extension StringExtensions on String {
@@ -48,4 +50,20 @@ UserNote getUserNote(dynamic value) {
   }
 
   return value is Map ? UserNote.fromJson(value) : value;
+}
+
+///Listed permissions
+bool isListedPermissions(Permission _permission) {
+  return Constant.allowedPermissions.contains(_permission);
+}
+
+///Checks for the permissions
+Future<bool> hasPermissions() async {
+  var _hasPermission = false;
+  for (var _permission in Permission.values) {
+    if (isListedPermissions(_permission)) {
+      _hasPermission = await _permission.status == PermissionStatus.granted;
+    }
+  }
+  return _hasPermission;
 }

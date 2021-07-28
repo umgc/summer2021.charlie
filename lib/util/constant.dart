@@ -3,9 +3,31 @@ import 'dart:io';
 
 import 'package:google_speech/google_speech.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 ///All constant values live here
 class Constant {
+  ///Permission name map
+  static final Map<Permission, String> mapPermissionName = {
+    Permission.microphone: 'Microphone',
+    Permission.storage: 'Photos and Media'
+  };
+
+  ///Permission status map
+  static final Map<PermissionStatus, String> mapPermissionStatus = {
+    PermissionStatus.denied: 'Denied',
+    PermissionStatus.granted: 'Granted',
+    PermissionStatus.limited: 'Limited',
+    PermissionStatus.permanentlyDenied: 'Permanently Denied',
+    PermissionStatus.restricted: 'Restricted',
+  };
+
+  ///Allowed Permissions
+  static final List<Permission> allowedPermissions = [
+    Permission.microphone,
+    Permission.storage
+  ];
+
   ///Check if file exists
   static Future<bool> getIfFileExists(String path) async {
     return File('$path').existsSync();
