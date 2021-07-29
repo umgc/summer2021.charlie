@@ -1,0 +1,39 @@
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+
+name: Develop Branch Linter, Build, Unit Test
+
+env:
+  FLUTTER_VERSION: "debug"
+
+on:
+  push:
+    branches: [ develop ]
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  build:
+    name: Build iOS
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v1
+      - run: flutter pub get
+
+      - name: Build Flutter as iOS
+        run: flutter build ipa --dart-define=GOOGLE_SERVICE_ACCOUNT_BASE64=${{secrets.GOOGLE_SERVICE_ACCOUNT_BASE64}}
+
+      # Upload Build Artifacts for download
+      - name: 'Upload iOS Artifact'
+        uses: 'actions/upload-artifact@v2'
+        with:
+          name: mnemosyne-iOS-${{env.FLUTTER_VERSION}}
+          path: build/app/outputs/*
