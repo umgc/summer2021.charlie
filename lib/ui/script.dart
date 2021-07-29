@@ -10,7 +10,7 @@ import '/util/util.dart';
 import 'edit.dart';
 import 'menudrawer.dart';
 import 'saveform.dart';
-import 'view_notes.dart';
+import 'view_notes_detail.dart';
 
 ///Script file
 class Script extends StatelessWidget {
@@ -49,7 +49,7 @@ class Script extends StatelessWidget {
       Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
               builder: (context) =>
-                  ViewNotes(filterFavorite: userNote.isFavorite)),
+                  ViewNotesDetail(filterFavorite: userNote.isFavorite)),
           (route) => false);
     });
   }
@@ -82,9 +82,7 @@ class Script extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-            color: Colors.white
-        ),
+        leading: BackButton(color: Colors.white),
         title: Text("Note"),
       ),
       endDrawer: MenuDrawer(),
@@ -100,15 +98,15 @@ class Script extends StatelessWidget {
             height: 5,
           ),
           SingleChildScrollView(
-            padding: EdgeInsets.all(12.0),
+              padding: EdgeInsets.all(12.0),
               child: TextHighlight(
-            text: userNote.note.trim(),
-            words: highlights,
-            textStyle: TextStyle(
-                fontSize: textSize,
-                color: Colors.black,
-                fontWeight: FontWeight.w400),
-          )),
+                text: userNote.note.trim(),
+                words: highlights,
+                textStyle: TextStyle(
+                    fontSize: textSize,
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400),
+              )),
           SizedBox(
               width: 400,
               child: ElevatedButton(
@@ -116,8 +114,8 @@ class Script extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                        builder: (context) =>
-                            ViewNotes(filterFavorite: userNote.isFavorite)),
+                        builder: (context) => ViewNotesDetail(
+                            filterFavorite: userNote.isFavorite)),
                   );
                 },
                 child: Text("Back",

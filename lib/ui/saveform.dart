@@ -75,9 +75,7 @@ class _SaveFormState extends State<SaveForm> {
 
     return Scaffold(
         appBar: AppBar(
-          leading: BackButton(
-              color: Colors.white
-          ),
+          leading: BackButton(color: Colors.white),
           title: Text("New Notes"),
         ),
         endDrawer: MenuDrawer(),

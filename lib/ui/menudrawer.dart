@@ -4,7 +4,7 @@ import '/service/local_auth_api.dart';
 import 'audio_recognize.dart';
 import 'saveform.dart';
 import 'settings.dart';
-import 'view_notes.dart';
+import 'view_notes_detail.dart';
 
 ///MenuDrawer
 class MenuDrawer extends StatelessWidget {
@@ -20,7 +20,8 @@ class MenuDrawer extends StatelessWidget {
     Navigator.pop(context);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => ViewNotes(filterFavorite: false)),
+      MaterialPageRoute(
+          builder: (context) => ViewNotesDetail(filterFavorite: false)),
     );
   }
 
@@ -31,7 +32,7 @@ class MenuDrawer extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-            builder: (context) => ViewNotes(filterFavorite: true)),
+            builder: (context) => ViewNotesDetail(filterFavorite: true)),
       );
     }
   }
