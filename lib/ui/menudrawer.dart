@@ -40,7 +40,7 @@ class MenuDrawer extends StatelessWidget {
     Navigator.pop(context);
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Settings()),
+      MaterialPageRoute(builder: (context) => MySettingsScreen()),
     );
   }
 
