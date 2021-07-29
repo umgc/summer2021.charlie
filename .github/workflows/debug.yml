@@ -37,8 +37,14 @@ jobs:
           fail-on: "analyze"
 
   build:
-    name: Build Project
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+        type: [Android, iOS]
+        output: [apk, ipa]
+
+    name: Build ${{ matrix.type }}
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
@@ -49,23 +55,15 @@ jobs:
         uses: subosito/flutter-action@v1
       - run: flutter pub get
 
-      - name: Build APK
-        run: |
-          flutter build apk --dart-define=GOOGLE_SERVICE_ACCOUNT_BASE64=${{secrets.GOOGLE_SERVICE_ACCOUNT_BASE64}}
+      - name: Build ${{ matrix.type }}
+        run: flutter build ${{ matrix.output }} --dart-define=GOOGLE_SERVICE_ACCOUNT_BASE64=${{secrets.GOOGLE_SERVICE_ACCOUNT_BASE64}}
 
       # Upload Build Artifacts for download
-      - name: 'Upload APK Artifact'
+      - name: 'Upload ${{ matrix.type }} Artifact'
         uses: 'actions/upload-artifact@v2'
         with:
-          name: mnemosyne-apk-${{env.FLUTTER_VERSION}}
-          path: build/app/outputs/flutter-apk/*.apk
-
-      # We can upload the web artifacts as well as it doesn't hurt.
-      - name: 'Upload Web Artifacts'
-        uses: 'actions/upload-artifact@v2'
-        with:
-          name: mnemosyne-${{env.FLUTTER_VERSION}}
-          path: build/web/**/*.*
+          name: mnemosyne-${{ matrix.type }}-${{env.FLUTTER_VERSION}}
+          path: build/app/outputs/*
           
   test:
     name: Run Unit Tests
