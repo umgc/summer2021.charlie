@@ -39,7 +39,6 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   Map topMenu;
   Map curMenu;
   bool onDates = true;
-  bool onSearch = false;
   double textSize = 12.0;
   final textController = TextEditingController();
 
@@ -82,6 +81,9 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     var userNote = UserNote();
     var isFavorite = false;
     var isAuthenticated = true;
+
+    await _closeKeyboard();
+
     if (!onDates) {
       userNote = getUserNote(curMenu[dateTime]);
       isFavorite = userNote != null && userNote.isFavorite;
@@ -109,7 +111,8 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     });
   }
 
-  void _backButton() {
+  void _backButton() async {
+    await _closeKeyboard();
     setState(() {
       onDates = true;
 
@@ -118,6 +121,8 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   }
 
   void _onSlideRightToDelete(BuildContext context, var curTime) async {
+    await _closeKeyboard();
+
     if (!onDates) {
       await logs.deleteLog(curDate, curTime);
 
@@ -130,52 +135,62 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     }
   }
 
-  void _searchButton(String searchTerm) async {
-    if (searchTerm.isEmpty || searchTerm.length <= 3) {
-      return;
-    }
+  void _clearSearch() {
     setState(() {
-      //Check whether or not the app is performing a search or clearing one
-      if (onSearch) {
-        //Clear the search and reset curMenu/topMenu
-        onSearch = false;
-        curMenu = _decryptedJson;
-        topMenu = _decryptedJson;
-      } else {
-        //Perform the search.
-        onSearch = true;
-        //Save search term, trim it, and lower case it to avoid case issues
-        // var searchTerm = textController.text.trim().toLowerCase();
-        textController.text = "";
+      topMenu = _decryptedJson;
+      curMenu = topMenu;
+      onDates = true;
+    });
+  }
 
-        //Generate a new map that only contains logs with the search term
-        var toReturn = {};
-        var curDate = {};
+  void _searchX() async {
+    textController.text = "";
+    await _clearSearch();
+    await _closeKeyboard();
+  }
 
-        //Loop through each date.
-        var dates = _decryptedJson.keys.toList();
+  void _closeKeyboard() async {
+    await FocusScope.of(context).requestFocus(FocusNode());
+  }
 
-        for (var d = 0; d < dates.length; d++) {
-          curDate = _decryptedJson[dates[d]];
-          var times = curDate.keys.toList();
+  void _searchButton(String searchTerm) async {
+    await setState(() async {
+      //If search box is empty, the search needs to be cleared
+      if (searchTerm.isEmpty) {
+        await _clearSearch();
+      }
 
-          //Loop through each time for this date.
-          for (var t = 0; t < times.length; t++) {
-            var uNote = getUserNote(curDate[times[t]]);
-            var curLog = uNote != null ? uNote.note.trim().toLowerCase() : null;
+      //Save search term, trim it, and lower case it to avoid case issues
+      searchTerm = searchTerm.trim().toLowerCase();
 
-            //Check if this log has the search term
-            if (curLog.contains(searchTerm)) {
-              //Search term found, add this date/time/note to toReturn
-              toReturn = _addLog(dates[d], times[t], uNote, toReturn);
-            }
+      //Generate a new map that only contains logs with the search term
+      var toReturn = {};
+      var curDate = {};
+
+      //Loop through each date.
+      var dates = _decryptedJson.keys.toList();
+
+      for (var d = 0; d < dates.length; d++) {
+        curDate = _decryptedJson[dates[d]];
+        var times = curDate.keys.toList();
+
+        //Loop through each time for this date.
+        for (var t = 0; t < times.length; t++) {
+          var uNote = getUserNote(curDate[times[t]]);
+          var curLog = uNote != null ? uNote.note.trim().toLowerCase() : null;
+
+          //Check if this log has the search term
+          if (curLog.contains(searchTerm)) {
+            //Search term found, add this date/time/note to toReturn
+            toReturn = _addLog(dates[d], times[t], uNote, toReturn);
           }
         }
-
-        //Set curMenu/topMenu to this created map
-        topMenu = toReturn;
-        curMenu = topMenu;
       }
+
+      //Change the current view based on search results
+      onDates = true;
+      topMenu = toReturn;
+      curMenu = topMenu;
     });
   }
 
@@ -211,7 +226,31 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
         curMenu == null || curMenu.keys == null ? [] : curMenu.keys.toList();
     var listSize = dateTimes.length;
 
-    return Scaffold(
+    if (!onDates) {
+      listSize++;
+    }
+
+    return GestureDetector(
+        onTap: _closeKeyboard,
+        child: Scaffold(
+            appBar: AppBar(
+              leading: BackButton(color: Colors.white),
+              title: _buildSearchBox(),
+            ),
+            endDrawer: MenuDrawer(),
+            body: Scaffold(
+              floatingActionButton: FloatingActionButton(
+                child: Container(
+                  child: Icon(Icons.add),
+                ),
+                onPressed: () {
+                  _addButtonPressed(context);
+                },
+              ),
+              body: listSize > 0 ? _getListView(dateTimes, listSize) : null,
+            )));
+
+    /*return Scaffold(
         appBar: AppBar(
           leading: BackButton(color: Colors.white),
           title: _buildSearchBox(),
@@ -227,14 +266,15 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
             },
           ),
           body: listSize > 0 ? _getListView(dateTimes, listSize) : null,
-        ));
+        ));*/
   }
 
   SizedBox _buildSearchBox() {
     return SizedBox(
         height: 40,
         child: TextField(
-          onChanged: _searchButton,
+          controller: textController,
+          onSubmitted: _searchButton,
           decoration: InputDecoration(
             fillColor: Colors.white,
             filled: true,
@@ -245,7 +285,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
             hintText: 'Search',
             prefixIcon: Icon(Icons.search),
             suffixIcon: IconButton(
-              onPressed: textController.clear,
+              onPressed: _searchX,
               icon: Icon(Icons.clear),
             ),
           ),
