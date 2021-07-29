@@ -4,7 +4,7 @@ import 'menudrawer.dart';
 import 'settingsform.dart';
 
 ///Settings page
-class Settings extends StatelessWidget {
+class MySettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
