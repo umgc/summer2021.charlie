@@ -5,12 +5,11 @@ import 'package:highlight_text/highlight_text.dart';
 
 import '/model/user_note.dart';
 import '/service/text_to_speech.dart';
-import '/util/settingsloader.dart';
 import '/util/textmap.dart';
 import '/util/util.dart';
 import 'edit.dart';
 import 'menudrawer.dart';
-import 'save.dart';
+import 'saveform.dart';
 import 'view_notes.dart';
 
 ///Script file
@@ -32,7 +31,6 @@ class Script extends StatelessWidget {
 
   final _tts = TextToSpeech();
   final TextMap _logs = TextMap();
-  final SettingsLoader _settingsLoader = SettingsLoader();
 
   ///Script to read
   Script(
@@ -59,7 +57,7 @@ class Script extends StatelessWidget {
   void _addButtonPressed(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Save()),
+      MaterialPageRoute(builder: (context) => SaveForm()),
     );
   }
 
@@ -84,6 +82,9 @@ class Script extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+            color: Colors.white
+        ),
         title: Text("Note"),
       ),
       endDrawer: MenuDrawer(),
@@ -91,26 +92,39 @@ class Script extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text("$date at ${time.substring(0, 5)}",
-              style: _settingsLoader.getStyle(textSize / 2)),
-          TextHighlight(
+              style: TextStyle(
+                  fontSize: textSize,
+                  color: Colors.indigo,
+                  decoration: TextDecoration.underline)),
+          SizedBox(
+            height: 5,
+          ),
+          SingleChildScrollView(
+            padding: EdgeInsets.all(12.0),
+              child: TextHighlight(
             text: userNote.note.trim(),
             words: highlights,
             textStyle: TextStyle(
                 fontSize: textSize,
                 color: Colors.black,
                 fontWeight: FontWeight.w400),
-          ),
-          ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        ViewNotes(filterFavorite: userNote.isFavorite)),
-              );
-            },
-            child: Text("Back"),
-          ),
+          )),
+          SizedBox(
+              width: 400,
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            ViewNotes(filterFavorite: userNote.isFavorite)),
+                  );
+                },
+                child: Text("Back",
+                    style: TextStyle(
+                      fontSize: 16,
+                    )),
+              )),
         ],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

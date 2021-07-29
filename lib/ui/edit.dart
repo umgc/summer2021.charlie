@@ -67,38 +67,62 @@ class Edit extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+            color: Colors.white
+        ),
         title: Text("Note"),
       ),
       endDrawer: MenuDrawer(),
-      body: Column(
-        children: [
-          TextField(
-            style: _settingsLoader.getStyle(textSize),
-            controller: _textController,
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "Enter text to save.",
+      body: Center(
+        child: Column(
+          children: [
+            SizedBox(height: 10),
+            Container(
+              width: 400.0,
+              child: TextField(
+                style: _settingsLoader.getStyle(textSize),
+                controller: _textController,
+                decoration: InputDecoration(
+                  border: OutlineInputBorder(),
+                  hintText: "Enter text to save.",
+                ),
+                maxLines: 4,
+              ),
             ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ElevatedButton(
-                onPressed: () {
-                  _saveButtonPressed(context);
-                },
-                child: Text("Save", style: _settingsLoader.getStyle(textSize)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _cancelButtonPressed(context);
-                },
-                child:
-                    Text("Cancel", style: _settingsLoader.getStyle(textSize)),
-              ),
-            ],
-          ),
-        ],
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  height: 20,
+                ),
+                SizedBox(
+                    width: 400,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        _saveButtonPressed(context);
+                      },
+                      child: Text("Save",
+                          style: _settingsLoader.getStyle(textSize)),
+                    )),
+                SizedBox(
+                    width: 400,
+                    child: ElevatedButton(
+                        onPressed: () {
+                          _cancelButtonPressed(context);
+                        },
+                        child: Text("Cancel",
+                            style: _settingsLoader.getStyle(textSize)),
+                        style: ElevatedButton.styleFrom(
+                            primary: Colors.white70,
+                            onPrimary: Colors.indigo,
+                            side: BorderSide(
+                                style: BorderStyle.solid,
+                                color: Colors.indigo,
+                                width: 1)))),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

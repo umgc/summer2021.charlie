@@ -8,7 +8,7 @@ import '/service/local_auth_api.dart';
 import '/util/settingsloader.dart';
 import '/util/textmap.dart';
 import '/util/util.dart';
-import 'save.dart';
+import 'saveform.dart';
 import 'script.dart';
 import 'view_notes.dart';
 
@@ -118,19 +118,6 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   }
 
   void _onSlideRightToDelete(BuildContext context, var curTime) async {
-    /*
-    if (onDates) {
-      await logs.deleteLog(curDate, null);
-      await _resetMapValues(true);
-    } else {
-      await logs.deleteLog(curDate, curTime);
-      await _resetMapValues(false);
-
-      curMenu = topMenu[curTime];
-    }
-    (context as Element).markNeedsBuild();
-    */
-
     if (!onDates) {
       await logs.deleteLog(curDate, curTime);
 
@@ -211,7 +198,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   void _addButtonPressed(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Save()),
+      MaterialPageRoute(builder: (context) => SaveForm()),
     );
   }
 
