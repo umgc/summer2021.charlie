@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '/util/constant.dart';
 import '/util/settingsloader.dart';
@@ -42,19 +43,14 @@ class _SettingsFormState extends State<SettingsForm> {
   void _saveChangesPressed() {
     settingsList = [_textSliderValue, _daysSliderValue.toInt()];
     settingsLoader.writeFile(settingsList);
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Settings()),
-    );
   }
 
-  void _resetSettingsPressed() {
-    settingsLoader.resetSettings();
+  void _resetSettingsPressed() async {
+    await settingsLoader.resetSettings();
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Settings()),
+      MaterialPageRoute(builder: (context) => MySettingsScreen()),
     );
   }
 
@@ -63,16 +59,7 @@ class _SettingsFormState extends State<SettingsForm> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Settings()),
-    );
-  }
-
-  void _deleteAllTexts() async {
-    await Constant.deleteFile(await Constant.getTextFilePath());
-
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Settings()),
+      MaterialPageRoute(builder: (context) => MySettingsScreen()),
     );
   }
 
@@ -85,82 +72,92 @@ class _SettingsFormState extends State<SettingsForm> {
     );
   }
 
+  void _trainingVideo() async {
+    const url = 'https://www.youtube.com/watch?v=Z7juO6O-yCQ';
+
+    await canLaunch(url) ? await launch(url) : throw 'Could not launch $url';
+  }
+
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Text("Text Size:", style: settingsLoader.getStyle(textSize)),
-              Slider(
-                  value: _textSliderValue,
-                  min: 10.0,
-                  max: 30.0,
-                  divisions: 10,
-                  label: _textSliderValue.round().toString(),
-                  onChanged: (var value) {
-                    setState(() {
-                      _textSliderValue = value;
-                    });
-                  }),
-              Text("Days Until Auto-Delete:",
-                  style: settingsLoader.getStyle(textSize)),
-              Slider(
-                  value: _daysSliderValue,
-                  min: 1,
-                  max: 30,
-                  divisions: 29,
-                  label: _daysSliderValue.round().toString(),
-                  onChanged: (var value) {
-                    setState(() {
-                      _daysSliderValue = value;
-                    });
-                  }),
-              ElevatedButton(
-                onPressed: () {},
-                child: Text("Training Video",
-                    style: settingsLoader.getStyle(textSize)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _resetSettingsPressed();
-                },
-                child: Text("Reset Settings",
-                    style: settingsLoader.getStyle(textSize)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _clearButtonPressed();
-                },
-                child: Text("Clear Notes File",
-                    style: settingsLoader.getStyle(textSize)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _saveChangesPressed();
-                },
-                child: Text("Save Changes",
-                    style: settingsLoader.getStyle(textSize)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _deleteAllTexts();
-                },
-                child: Text("Delete All Texts",
-                    style: settingsLoader.getStyle(textSize)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  _reRecordUsersVoice();
-                },
-                child: Text("Re-record User's Voice",
-                    style: settingsLoader.getStyle(textSize)),
-              ),
-            ],
+      body: ListView(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.format_color_text),
+            title: Text('Text Size', style: settingsLoader.getStyle(textSize)),
           ),
-        ),
+          Card(
+            child: Slider(
+                value: _textSliderValue,
+                min: 10.0,
+                max: 30.0,
+                divisions: 10,
+                label: _textSliderValue.round().toString(),
+                onChanged: (var value) {
+                  setState(() {
+                    _textSliderValue = value;
+                    textSize = value;
+                    _saveChangesPressed();
+                  });
+                }),
+          ),
+          ListTile(
+            leading: const Icon(Icons.access_time),
+            title: Text("Days Until Auto-Delete:",
+                style: settingsLoader.getStyle(textSize)),
+          ),
+          Card(
+            child: Slider(
+                value: _daysSliderValue,
+                min: 1,
+                max: 30,
+                divisions: 29,
+                label: _daysSliderValue.round().toString(),
+                onChanged: (var value) {
+                  setState(() {
+                    _daysSliderValue = value;
+                    _saveChangesPressed();
+                  });
+                }),
+          ),
+          Card(
+            child: ListTile(
+                leading: const Icon(Icons.featured_video_outlined),
+                title: Text('Training Video',
+                    style: settingsLoader.getStyle(textSize)),
+                onTap: () {
+                  _trainingVideo();
+                }),
+          ),
+          Card(
+            child: ListTile(
+                leading: const Icon(Icons.record_voice_over),
+                title: Text('Re-record Voice Profile',
+                    style: settingsLoader.getStyle(textSize)),
+                onTap: () {
+                  _reRecordUsersVoice();
+                }),
+          ),
+          Card(
+            child: ListTile(
+              leading: const Icon(Icons.subdirectory_arrow_left),
+              title: Text('Reset Settings',
+                  style: settingsLoader.getStyle(textSize)),
+              onTap: () {
+                _resetSettingsPressed();
+              },
+            ),
+          ),
+          Card(
+            child: ListTile(
+                leading: const Icon(Icons.phonelink_erase),
+                title: Text('Delete All Notes',
+                    style: settingsLoader.getStyle(textSize)),
+                onTap: () {
+                  _clearButtonPressed();
+                }),
+          ),
+        ],
       ),
     );
   }

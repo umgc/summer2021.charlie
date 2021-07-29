@@ -23,7 +23,7 @@ void callbackDispatcher() {
   });
 }
 
-void main() {
+void main() async {
   ///Initializing work manager
   WidgetsFlutterBinding.ensureInitialized();
 
