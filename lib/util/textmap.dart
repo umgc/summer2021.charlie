@@ -13,6 +13,10 @@ class TextMap {
 
   ///Adds log to the map matrix based on the passed date/time
   void addLog(String date, String time, String log) async {
+    if(log.isEmpty) {
+      return;
+    }
+
     var fileText = await getDecryptedContent();
     var dateTimeText = readJson(input: fileText, filterFavorite: false);
     var userNote = UserNote(note: log, isFavorite: false);
