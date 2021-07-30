@@ -80,6 +80,7 @@ class Script extends StatelessWidget {
   }
 
   Widget build(BuildContext context) {
+    userNote.note = userNote.note.isEmpty ? "--- Invalid note ---" : userNote.note;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(color: Colors.white),
