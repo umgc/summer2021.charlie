@@ -4,10 +4,13 @@ import 'menudrawer.dart';
 import 'settingsform.dart';
 
 ///Settings page
-class Settings extends StatelessWidget {
+class MySettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: BackButton(
+            color: Colors.white
+        ),
         title: Text("Settings"),
       ),
       endDrawer: MenuDrawer(),

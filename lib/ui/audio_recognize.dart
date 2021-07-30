@@ -132,7 +132,6 @@ class _AudioRecognizeState extends State<AudioRecognize> {
             _text = responseText;
             recognizeFinished = true;
           });
-          _saveText();
         }
       }
     }, onDone: () {
@@ -143,21 +142,20 @@ class _AudioRecognizeState extends State<AudioRecognize> {
   }
 
   void _saveText() {
-    setState(() {
-      var curDateTime = DateTime.now().toString();
-      var curDate = curDateTime.substring(0, 10);
-      var curTime = curDateTime.substring(11);
+    var curDateTime = DateTime.now().toString();
+    var curDate = curDateTime.substring(0, 10);
+    var curTime = curDateTime.substring(11);
 
-      logs.addLog(curDate, curTime, _text);
+    logs.addLog(curDate, curTime, _text);
 
-      outputText = "$curDateTime: $_text";
-    });
+    outputText = "$curDateTime: $_text";
   }
 
   void stopRecording() async {
     await _recorder.stop();
     await _audioStreamSubscription?.cancel();
     await _audioStream?.close();
+    _saveText();
     setState(() {
       recognizing = false;
     });

@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:workmanager/workmanager.dart';
 
-import '/ui/audio_recorder.dart';
-import '/util/constant.dart';
 import 'service/scheduled_delete_text.dart';
 import 'ui/audio_recognize.dart';
+import 'ui/audio_recorder.dart';
+import 'ui/permission_handler_widget.dart';
+import 'util/constant.dart';
+import 'util/util.dart';
 
 /// This task runs periodically
 const simplePeriodic1HourTask = "Old Notes Deleted";
@@ -21,7 +23,7 @@ void callbackDispatcher() {
   });
 }
 
-void main() {
+void main() async {
   ///Initializing work manager
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -69,6 +71,9 @@ class MyApp extends StatelessWidget {
   }
 
   Future<Widget> _getHomeWidget() async {
+    if (!await hasPermissions()) {
+      return PermissionHandlerWidget();
+    }
     if (await _audioFileExists) {
       return AudioRecognize();
     }
