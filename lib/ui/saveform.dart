@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import '/model/user_note.dart';
 import '/util/settingsloader.dart';
 import '/util/textmap.dart';
+import 'menudrawer.dart';
 import 'script.dart';
 
 ///Save form
@@ -73,35 +74,44 @@ class _SaveFormState extends State<SaveForm> {
     }
 
     return Scaffold(
-      body: Column(
-        children: [
-          SizedBox(height: 10),
-          Container(
-            width: 400.0,
-            child: TextField(
-              style: TextStyle(fontSize: textSize, height: 1.5),
-              controller: textController,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: "Enter text to save.",
-              ),
-              maxLines: 4,
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        appBar: AppBar(
+          leading: BackButton(color: Colors.white),
+          title: Text("New Notes"),
+        ),
+        endDrawer: MenuDrawer(),
+        body: Scaffold(
+          body: Column(
             children: [
-              ElevatedButton(
-                onPressed: () {
-                  _buttonPressed();
-                },
-                child: Text("Save", style: settingsLoader.getStyle(textSize)),
+              SizedBox(height: 10),
+              Container(
+                width: 400.0,
+                child: TextField(
+                  style: TextStyle(fontSize: textSize, height: 1.5),
+                  controller: textController,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: "Enter text to save.",
+                  ),
+                  maxLines: 4,
+                ),
               ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(
+                      width: 400,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          _buttonPressed();
+                        },
+                        child: Text("Save",
+                            style: settingsLoader.getStyle(textSize)),
+                      )),
+                ],
+              ),
+              Text(outputText),
             ],
           ),
-          Text(outputText),
-        ],
-      ),
-    );
+        ));
   }
 }

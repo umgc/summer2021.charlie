@@ -8,9 +8,9 @@ import '/service/local_auth_api.dart';
 import '/util/settingsloader.dart';
 import '/util/textmap.dart';
 import '/util/util.dart';
-import 'save.dart';
+import 'menudrawer.dart';
+import 'saveform.dart';
 import 'script.dart';
-import 'view_notes.dart';
 
 ///LoadForm
 class ViewNotesDetail extends StatefulWidget {
@@ -39,7 +39,6 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   Map topMenu;
   Map curMenu;
   bool onDates = true;
-  bool onSearch = false;
   double textSize = 12.0;
   final textController = TextEditingController();
 
@@ -82,6 +81,9 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     var userNote = UserNote();
     var isFavorite = false;
     var isAuthenticated = true;
+
+    await _closeKeyboard();
+
     if (!onDates) {
       userNote = getUserNote(curMenu[dateTime]);
       isFavorite = userNote != null && userNote.isFavorite;
@@ -109,7 +111,8 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     });
   }
 
-  void _backButton() {
+  void _backButton() async {
+    await _closeKeyboard();
     setState(() {
       onDates = true;
 
@@ -118,18 +121,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   }
 
   void _onSlideRightToDelete(BuildContext context, var curTime) async {
-    /*
-    if (onDates) {
-      await logs.deleteLog(curDate, null);
-      await _resetMapValues(true);
-    } else {
-      await logs.deleteLog(curDate, curTime);
-      await _resetMapValues(false);
-
-      curMenu = topMenu[curTime];
-    }
-    (context as Element).markNeedsBuild();
-    */
+    await _closeKeyboard();
 
     if (!onDates) {
       await logs.deleteLog(curDate, curTime);
@@ -137,55 +129,68 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
       Timer.run(() async {
         Navigator.of(context).pushAndRemoveUntil(
             MaterialPageRoute(
-                builder: (context) => ViewNotes(filterFavorite: false)),
+                builder: (context) => ViewNotesDetail(filterFavorite: false)),
             (route) => false);
       });
     }
   }
 
-  void _searchButton() {
+  void _clearSearch() {
     setState(() {
-      //Check whether or not the app is performing a search or clearing one
-      if (onSearch) {
-        //Clear the search and reset curMenu/topMenu
-        onSearch = false;
-        curMenu = _decryptedJson;
-        topMenu = _decryptedJson;
-      } else {
-        //Perform the search.
-        onSearch = true;
-        //Save serach term, trim it, and lower case it to avoid case issues
-        var searchTerm = textController.text.trim().toLowerCase();
-        textController.text = "";
+      topMenu = _decryptedJson;
+      curMenu = topMenu;
+      onDates = true;
+    });
+  }
 
-        //Generate a new map that only contains logs with the search term
-        var toReturn = {};
-        var curDate = {};
+  void _searchX() async {
+    textController.text = "";
+    await _clearSearch();
+    await _closeKeyboard();
+  }
 
-        //Loop through each date.
-        var dates = _decryptedJson.keys.toList();
+  void _closeKeyboard() async {
+    await FocusScope.of(context).requestFocus(FocusNode());
+  }
 
-        for (var d = 0; d < dates.length; d++) {
-          curDate = _decryptedJson[dates[d]];
-          var times = curDate.keys.toList();
+  void _searchButton(String searchTerm) async {
+    await setState(() async {
+      //If search box is empty, the search needs to be cleared
+      if (searchTerm.isEmpty) {
+        await _clearSearch();
+      }
 
-          //Loop through each time for this date.
-          for (var t = 0; t < times.length; t++) {
-            var uNote = getUserNote(curDate[times[t]]);
-            var curLog = uNote != null ? uNote.note.trim().toLowerCase() : null;
+      //Save search term, trim it, and lower case it to avoid case issues
+      searchTerm = searchTerm.trim().toLowerCase();
 
-            //Check if this log has the search term
-            if (curLog.contains(searchTerm)) {
-              //Search term found, add this date/time/note to toReturn
-              toReturn = _addLog(dates[d], times[t], uNote, toReturn);
-            }
+      //Generate a new map that only contains logs with the search term
+      var toReturn = {};
+      var curDate = {};
+
+      //Loop through each date.
+      var dates = _decryptedJson.keys.toList();
+
+      for (var d = 0; d < dates.length; d++) {
+        curDate = _decryptedJson[dates[d]];
+        var times = curDate.keys.toList();
+
+        //Loop through each time for this date.
+        for (var t = 0; t < times.length; t++) {
+          var uNote = getUserNote(curDate[times[t]]);
+          var curLog = uNote != null ? uNote.note.trim().toLowerCase() : null;
+
+          //Check if this log has the search term
+          if (curLog.contains(searchTerm)) {
+            //Search term found, add this date/time/note to toReturn
+            toReturn = _addLog(dates[d], times[t], uNote, toReturn);
           }
         }
-
-        //Set curMenu/topMenu to this created map
-        topMenu = toReturn;
-        curMenu = topMenu;
       }
+
+      //Change the current view based on search results
+      onDates = true;
+      topMenu = toReturn;
+      curMenu = topMenu;
     });
   }
 
@@ -211,7 +216,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
   void _addButtonPressed(BuildContext context) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => Save()),
+      MaterialPageRoute(builder: (context) => SaveForm()),
     );
   }
 
@@ -219,112 +224,141 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     //Generating list of Dates/Times for initial buttons
     var dateTimes =
         curMenu == null || curMenu.keys == null ? [] : curMenu.keys.toList();
-    var listSize = dateTimes.length + 1;
+    var listSize = dateTimes.length;
 
-    if (onDates && !onSearch) {
+    if (!onDates) {
       listSize++;
     }
 
-    return Scaffold(
-      floatingActionButton: FloatingActionButton(
-        child: Container(
-          child: Icon(Icons.add),
-        ),
-        onPressed: () {
-          _addButtonPressed(context);
-        },
-      ),
-      body: ListView.builder(
-          padding: const EdgeInsets.all(8),
-          itemCount: listSize,
-          itemBuilder: (context, i) {
-            //Last items on dates list are the serach field and button
-            //Search field for dates list
-            if (onDates && i == listSize - 2 && !onSearch) {
-              return TextField(
-                style: settingsLoader.getStyle(textSize),
-                controller: textController,
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "Search",
+    return GestureDetector(
+        onTap: _closeKeyboard,
+        child: Scaffold(
+            appBar: AppBar(
+              leading: BackButton(color: Colors.white),
+              title: _buildSearchBox(),
+            ),
+            endDrawer: MenuDrawer(),
+            body: Scaffold(
+              floatingActionButton: FloatingActionButton(
+                child: Container(
+                  child: Icon(Icons.add),
                 ),
-              );
-            }
-
-            //Search button for dates list
-            if (onDates && i == listSize - 1) {
-              var searchText = "Search";
-
-              if (onSearch) {
-                searchText = "Clear Search";
-              }
-
-              return ElevatedButton(
                 onPressed: () {
-                  _searchButton();
+                  _addButtonPressed(context);
                 },
-                child:
-                    Text(searchText, style: settingsLoader.getStyle(textSize)),
-              );
-            }
-
-            //Last button on the times list should be a back button
-            if (!onDates && i == listSize - 1) {
-              //back button for list of times
-              return ElevatedButton(
-                onPressed: () {
-                  _backButton();
-                },
-                child: Text("Back", style: settingsLoader.getStyle(textSize)),
-              );
-            }
-
-            //Create appropriate label for upcoming button
-            String buttonName = dateTimes[i];
-            String subTitle = dateTimes[i];
-            var isFavorite = false;
-
-            //If this is a time, the button text needs a preview
-            if (!onDates) {
-              buttonName = "${buttonName.substring(0, 5)}: ";
-
-              var mapVal = curMenu[dateTimes[i]];
-              var fullNote = mapVal is String
-                  ? mapVal
-                  : (mapVal is UserNote ? mapVal.note : mapVal["note"]);
-              //Check that the note is not shorter than 20 characters
-              subTitle =
-                  fullNote.length < 20 ? fullNote : fullNote.substring(0, 20);
-              subTitle += '...';
-
-              isFavorite = mapVal is String
-                  ? false
-                  : (mapVal is UserNote
-                      ? mapVal.isFavorite
-                      : mapVal["isFavorite"]);
-            }
-
-            return Dismissible(
-              onDismissed: (direction) {
-                setState(() {
-                  _onSlideRightToDelete(context, dateTimes[i]);
-                });
-              },
-              secondaryBackground: Container(
-                child: Center(
-                  child: Text(
-                    'Delete',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-                color: Colors.red,
               ),
-              background: Container(),
-              child: _noteCard(dateTimes[i], subTitle, isFavorite),
-              key: UniqueKey(),
-              direction: DismissDirection.endToStart,
-            );
-          }),
+              body: listSize > 0 ? _getListView(dateTimes, listSize) : null,
+            )));
+
+    /*return Scaffold(
+        appBar: AppBar(
+          leading: BackButton(color: Colors.white),
+          title: _buildSearchBox(),
+        ),
+        endDrawer: MenuDrawer(),
+        body: Scaffold(
+          floatingActionButton: FloatingActionButton(
+            child: Container(
+              child: Icon(Icons.add),
+            ),
+            onPressed: () {
+              _addButtonPressed(context);
+            },
+          ),
+          body: listSize > 0 ? _getListView(dateTimes, listSize) : null,
+        ));*/
+  }
+
+  SizedBox _buildSearchBox() {
+    return SizedBox(
+        height: 40,
+        child: TextField(
+          controller: textController,
+          onSubmitted: _searchButton,
+          decoration: InputDecoration(
+            fillColor: Colors.white,
+            filled: true,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(7.0),
+              borderSide: BorderSide.none,
+            ),
+            hintText: 'Search',
+            prefixIcon: Icon(Icons.search),
+            suffixIcon: IconButton(
+              onPressed: _searchX,
+              icon: Icon(Icons.clear),
+            ),
+          ),
+        ));
+  }
+
+  Widget _getListView(var dateTimes, var listSize) {
+    return ListView.builder(
+        padding: const EdgeInsets.all(8),
+        itemCount: listSize,
+        itemBuilder: (context, i) {
+          //Last button on the times list should be a back button
+          return _getItemBuilder(i, listSize, dateTimes, context);
+        });
+  }
+
+  StatefulWidget _getItemBuilder(
+      int i, listSize, dateTimes, BuildContext context) {
+    //Last button on the times list should be a back button
+    if (!onDates && i == listSize - 1) {
+      //back button for list of times
+      return ElevatedButton(
+        onPressed: () {
+          _backButton();
+        },
+        child: Text("Back", style: settingsLoader.getStyle(textSize)),
+      );
+    }
+
+    //Create appropriate label for upcoming button
+    String buttonName = dateTimes[i];
+    String subTitle = dateTimes[i];
+    var isFavorite = false;
+
+    //If this is a time, the button text needs a preview
+    if (!onDates) {
+      buttonName = "${buttonName.substring(0, 5)}: ";
+      var mapVal = curMenu[dateTimes[i]];
+      var fullNote = mapVal is String
+          ? mapVal
+          : (mapVal is UserNote ? mapVal.note : mapVal["note"]);
+
+      if (fullNote == null) {
+        return null;
+      }
+      //Check that the note is not shorter than 20 characters
+      subTitle = fullNote.length < 20 ? fullNote : fullNote.substring(0, 20);
+      subTitle += '...';
+
+      isFavorite = mapVal is String
+          ? false
+          : (mapVal is UserNote ? mapVal.isFavorite : mapVal["isFavorite"]);
+    }
+
+    return Dismissible(
+      onDismissed: (direction) {
+        setState(() {
+          _onSlideRightToDelete(context, dateTimes[i]);
+        });
+      },
+      secondaryBackground: Container(
+        child: Center(
+          child: Text(
+            'Delete',
+            style: TextStyle(color: Colors.white),
+          ),
+        ),
+        color: Colors.red,
+      ),
+      background: Container(),
+      child: _noteCard(dateTimes[i], subTitle, isFavorite),
+      key: UniqueKey(),
+      direction: DismissDirection.endToStart,
     );
   }
 
