@@ -133,14 +133,6 @@ void _requestPermissions() {
         badge: true,
         sound: true,
       );
-  flutterLocalNotificationsPlugin
-      .resolvePlatformSpecificImplementation<
-          MacOSFlutterLocalNotificationsPlugin>()
-      ?.requestPermissions(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
 }
 
 void _configureSelectNotificationSubject(BuildContext context) {
