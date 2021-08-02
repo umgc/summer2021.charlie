@@ -8,9 +8,7 @@ class MySettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-            color: Colors.white
-        ),
+        leading: BackButton(color: Colors.white),
         title: Text("Settings"),
       ),
       endDrawer: MenuDrawer(),

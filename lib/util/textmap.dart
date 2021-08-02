@@ -2,18 +2,20 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
-import '../model/user_note.dart';
-import '../service/encryption_service.dart';
+import '/model/user_note.dart';
+import '/service/encryption_service.dart';
 import 'constant.dart';
+import 'scheduled_text.dart';
 import 'util.dart';
 
 ///Text map for the JSON
 class TextMap {
   final EncryptionService _encryptionService = EncryptionService();
+  ScheduledText sched = ScheduledText();
 
   ///Adds log to the map matrix based on the passed date/time
   void addLog(String date, String time, String log) async {
-    if(log.isEmpty) {
+    if (log.isEmpty) {
       return;
     }
 
@@ -35,6 +37,9 @@ class TextMap {
 
     //Write to file after adding log
     writeFile(dateTimeText);
+
+    //Send to scheduled text check
+    sched.checkScheduleKeyWords(date, time, log);
   }
 
   ///Changes the log at passed date/time to the passed log

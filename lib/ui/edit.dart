@@ -67,9 +67,7 @@ class Edit extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        leading: BackButton(
-            color: Colors.white
-        ),
+        leading: BackButton(color: Colors.white),
         title: Text("Note"),
       ),
       endDrawer: MenuDrawer(),
