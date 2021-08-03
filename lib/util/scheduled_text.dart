@@ -16,6 +16,7 @@ bool isTzLocalInitialized;
 
 ///ScheduledText for notification
 class ScheduledText {
+  ///Scheduled keywords
   final List<String> schedKeywords = [
     'tonight',
     ', o clock',
@@ -51,8 +52,6 @@ class ScheduledText {
     var scheduledValue = _getSanitizedDateTimeValue;
 
     print('---> scheduledValue = $scheduledValue');
-    //TODO notify that you ll remind the user at this time (_allWords[_keywordIndex - 1] + _keywordFound)
-
     var scheduledDateTime = _getScheduledDateTime(scheduledValue);
     await _notificationService.zonedScheduleNotification(scheduledDateTime,
         NotificationPayload(dateText: date, timeText: time, note: log));

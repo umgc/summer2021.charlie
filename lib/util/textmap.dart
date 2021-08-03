@@ -11,7 +11,8 @@ import 'util.dart';
 ///Text map for the JSON
 class TextMap {
   final EncryptionService _encryptionService = EncryptionService();
-  ScheduledText sched = ScheduledText();
+
+  final ScheduledText _schedText = ScheduledText();
 
   ///Adds log to the map matrix based on the passed date/time
   void addLog(String date, String time, String log) async {
@@ -39,7 +40,7 @@ class TextMap {
     writeFile(dateTimeText);
 
     //Send to scheduled text check
-    sched.checkScheduleKeyWords(date, time, log);
+    _schedText.checkScheduleKeyWords(date, time, log);
   }
 
   ///Changes the log at passed date/time to the passed log

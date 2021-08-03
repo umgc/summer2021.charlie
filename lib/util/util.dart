@@ -67,3 +67,28 @@ Future<bool> hasPermissions() async {
   }
   return _hasPermission;
 }
+
+///Show dialog for devices without authentication
+Future<void> showDialogOnPlatformException(BuildContext context) {
+  return showDialog<void>(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: Text('Error'),
+        content: SingleChildScrollView(
+          child: Text(
+            'Device does not have a biometrics (fingerprint or face id) '
+                'authentication setup. Please update the Security settings on '
+                'your device.',
+          ),
+        ),
+        actions: <Widget>[
+          TextButton(
+            child: Text('Ok'),
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      );
+    },
+  );
+}

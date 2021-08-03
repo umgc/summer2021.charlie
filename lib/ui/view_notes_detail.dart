@@ -77,7 +77,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     });
   }
 
-  void _buttonPressed(String dateTime) async {
+  void _buttonPressed(BuildContext bldContext, String dateTime) async {
     var userNote = UserNote();
     var isFavorite = false;
     var isAuthenticated = true;
@@ -87,7 +87,8 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     if (!onDates) {
       userNote = getUserNote(curMenu[dateTime]);
       isFavorite = userNote != null && userNote.isFavorite;
-      isAuthenticated = isFavorite ? await LocalAuthApi.authenticate() : true;
+      isAuthenticated =
+          isFavorite ? await LocalAuthApi.authenticate(bldContext) : true;
     }
 
     setState(() {
@@ -247,7 +248,9 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
                   _addButtonPressed(context);
                 },
               ),
-              body: listSize > 0 ? _getListView(dateTimes, listSize) : null,
+              body: listSize > 0
+                  ? _getListView(context, dateTimes, listSize)
+                  : null,
             )));
 
     /*return Scaffold(
@@ -292,18 +295,18 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
         ));
   }
 
-  Widget _getListView(var dateTimes, var listSize) {
+  Widget _getListView(BuildContext bldContext, var dateTimes, var listSize) {
     return ListView.builder(
         padding: const EdgeInsets.all(8),
         itemCount: listSize,
         itemBuilder: (context, i) {
           //Last button on the times list should be a back button
-          return _getItemBuilder(i, listSize, dateTimes, context);
+          return _getItemBuilder(bldContext, i, listSize, dateTimes, context);
         });
   }
 
-  StatefulWidget _getItemBuilder(
-      int i, listSize, dateTimes, BuildContext context) {
+  StatefulWidget _getItemBuilder(BuildContext bldContext, int i, listSize,
+      dateTimes, BuildContext context) {
     //Last button on the times list should be a back button
     if (!onDates && i == listSize - 1) {
       //back button for list of times
@@ -356,19 +359,20 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
         color: Colors.red,
       ),
       background: Container(),
-      child: _noteCard(dateTimes[i], subTitle, isFavorite),
+      child: _noteCard(bldContext, dateTimes[i], subTitle, isFavorite),
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
     );
   }
 
-  Widget _noteCard(var dateTime, String subTitle, bool isFavorite) {
+  Widget _noteCard(
+      BuildContext bldContext, var dateTime, String subTitle, bool isFavorite) {
     var buttonName =
         dateTime != subTitle ? "${dateTime.substring(0, 8)}" : dateTime;
     return Card(
       child: InkWell(
         onTap: () {
-          _buttonPressed(dateTime);
+          _buttonPressed(bldContext, dateTime);
         },
         child: Column(
           children: <Widget>[
