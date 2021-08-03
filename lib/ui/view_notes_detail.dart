@@ -221,7 +221,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     );
   }
 
-  Widget build(BuildContext context) {
+  Widget build(BuildContext bldContext) {
     //Generating list of Dates/Times for initial buttons
     var dateTimes =
         curMenu == null || curMenu.keys == null ? [] : curMenu.keys.toList();
@@ -245,31 +245,13 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
                   child: Icon(Icons.add),
                 ),
                 onPressed: () {
-                  _addButtonPressed(context);
+                  _addButtonPressed(bldContext);
                 },
               ),
               body: listSize > 0
-                  ? _getListView(context, dateTimes, listSize)
+                  ? _getListView(bldContext, dateTimes, listSize)
                   : null,
             )));
-
-    /*return Scaffold(
-        appBar: AppBar(
-          leading: BackButton(color: Colors.white),
-          title: _buildSearchBox(),
-        ),
-        endDrawer: MenuDrawer(),
-        body: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            child: Container(
-              child: Icon(Icons.add),
-            ),
-            onPressed: () {
-              _addButtonPressed(context);
-            },
-          ),
-          body: listSize > 0 ? _getListView(dateTimes, listSize) : null,
-        ));*/
   }
 
   SizedBox _buildSearchBox() {
