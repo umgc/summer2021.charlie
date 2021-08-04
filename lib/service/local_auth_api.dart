@@ -1,5 +1,8 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
+
+import '/util/util.dart';
 
 ///Local auth api service
 class LocalAuthApi {
@@ -26,7 +29,7 @@ class LocalAuthApi {
   }
 
   ///Authenticate
-  static Future<bool> authenticate() async {
+  static Future<bool> authenticate(BuildContext context) async {
     final isAvailable = await hasBiometrics();
     if (!isAvailable) return false;
 
@@ -39,6 +42,7 @@ class LocalAuthApi {
       );
     } on PlatformException catch (e) {
       print('Error in authenticate `$e');
+      showDialogOnPlatformException(context);
       return false;
     }
   }

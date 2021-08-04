@@ -14,6 +14,9 @@ import 'view_notes_detail.dart';
 
 ///Script file
 class Script extends StatelessWidget {
+  ///Route name
+  static const String routeName = '/script';
+
   ///Log
   final UserNote userNote;
 
@@ -80,7 +83,8 @@ class Script extends StatelessWidget {
   }
 
   Widget build(BuildContext context) {
-    userNote.note = userNote.note.isEmpty ? "--- Invalid note ---" : userNote.note;
+    userNote.note =
+        userNote.note.isNullOrEmpty() ? "--- Invalid note ---" : userNote.note;
     return Scaffold(
       appBar: AppBar(
         leading: BackButton(color: Colors.white),
