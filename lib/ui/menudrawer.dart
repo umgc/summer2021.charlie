@@ -26,7 +26,7 @@ class MenuDrawer extends StatelessWidget {
   }
 
   _loadFavorites(BuildContext context) async {
-    final isAuthenticated = await LocalAuthApi.authenticate();
+    final isAuthenticated = await LocalAuthApi.authenticate(context);
     if (isAuthenticated) {
       Navigator.pop(context);
       Navigator.push(

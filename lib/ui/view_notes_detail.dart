@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 
 import '/model/user_note.dart';
 import '/service/local_auth_api.dart';
@@ -77,7 +78,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     });
   }
 
-  void _buttonPressed(String dateTime) async {
+  void _buttonPressed(BuildContext bldContext, String dateTime) async {
     var userNote = UserNote();
     var isFavorite = false;
     var isAuthenticated = true;
@@ -87,7 +88,8 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     if (!onDates) {
       userNote = getUserNote(curMenu[dateTime]);
       isFavorite = userNote != null && userNote.isFavorite;
-      isAuthenticated = isFavorite ? await LocalAuthApi.authenticate() : true;
+      isAuthenticated =
+          isFavorite ? await LocalAuthApi.authenticate(bldContext) : true;
     }
 
     setState(() {
@@ -220,7 +222,145 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
     );
   }
 
-  Widget build(BuildContext context) {
+  //Returns a user-friendly label for the passed date or time String
+  String _generateButtonName(String dateTime) {
+    var toReturn = dateTime;
+
+    //First determine if the String is a date or a time
+    if (dateTime.contains(':')) {
+      //Time
+      toReturn = toReturn.substring(0, 5);
+
+      var hour = int.parse(toReturn.substring(0, 2));
+      var minutes = int.parse(toReturn.substring(3, 5));
+      var suffix = "";
+
+      if (hour >= 12) {
+        suffix = "P.M.";
+
+        if (hour > 12) {
+          hour -= 12;
+        }
+      } else {
+        suffix = "A.M.";
+
+        if (hour == 0) {
+          hour = 12;
+        }
+      }
+
+      toReturn = "$hour:$minutes $suffix";
+    } else {
+      //Date
+      var noteDate = DateTime.parse(toReturn);
+      var currentDate = DateTime.now();
+      var between = _daysBetween(noteDate, currentDate);
+
+      if (between == 0) {
+        toReturn = "Today";
+      } else if (between == 1) {
+        toReturn = "Yesterday";
+      } else if (between > 2 && between <= 7) {
+        toReturn = "Last ${DateFormat('EEEE').format(noteDate)}";
+      } else if (between > 7 && between <= 14) {
+        toReturn = "Last week";
+      } else if (between > 14 && between <= 21) {
+        toReturn = "Two weeks ago";
+      } else if (between > 21 && between <= 28) {
+        toReturn = "Three weeks ago";
+      } else {
+        toReturn = "Over three weeks ago";
+      }
+    }
+
+    return toReturn;
+  }
+
+  //Returns a user-friendly subtitle based on the based date
+  String _generateSubtitle(String dateTime) {
+    var toReturn = dateTime;
+
+    var year = toReturn.substring(0, 4);
+    var month = toReturn.substring(5, 7);
+    var day = toReturn.substring(8, 10);
+
+    switch (month) {
+      case "01":
+        {
+          month = "January";
+        }
+        break;
+      case "02":
+        {
+          month = "February";
+        }
+        break;
+      case "03":
+        {
+          month = "March";
+        }
+        break;
+      case "04":
+        {
+          month = "April";
+        }
+        break;
+      case "05":
+        {
+          month = "May";
+        }
+        break;
+      case "06":
+        {
+          month = "June";
+        }
+        break;
+      case "07":
+        {
+          month = "July";
+        }
+        break;
+      case "08":
+        {
+          month = "August";
+        }
+        break;
+      case "09":
+        {
+          month = "September";
+        }
+        break;
+      case "10":
+        {
+          month = "October";
+        }
+        break;
+      case "11":
+        {
+          month = "November";
+        }
+        break;
+      case "12":
+        {
+          month = "December";
+        }
+        break;
+    }
+
+    day = int.parse(day).toString();
+    toReturn = "$month $day, $year";
+
+    return toReturn;
+  }
+
+  ///Returns the number of calendar days between the two passed dates
+  int _daysBetween(DateTime from, DateTime to) {
+    from = DateTime(from.year, from.month, from.day);
+    to = DateTime(to.year, to.month, to.day);
+    return (to.difference(from).inHours / 24).round();
+  }
+
+  Widget build(BuildContext bldContext) {
     //Generating list of Dates/Times for initial buttons
     var dateTimes =
         curMenu == null || curMenu.keys == null ? [] : curMenu.keys.toList();
@@ -244,29 +384,13 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
                   child: Icon(Icons.add),
                 ),
                 onPressed: () {
-                  _addButtonPressed(context);
+                  _addButtonPressed(bldContext);
                 },
               ),
-              body: listSize > 0 ? _getListView(dateTimes, listSize) : null,
+              body: listSize > 0
+                  ? _getListView(bldContext, dateTimes, listSize)
+                  : null,
             )));
-
-    /*return Scaffold(
-        appBar: AppBar(
-          leading: BackButton(color: Colors.white),
-          title: _buildSearchBox(),
-        ),
-        endDrawer: MenuDrawer(),
-        body: Scaffold(
-          floatingActionButton: FloatingActionButton(
-            child: Container(
-              child: Icon(Icons.add),
-            ),
-            onPressed: () {
-              _addButtonPressed(context);
-            },
-          ),
-          body: listSize > 0 ? _getListView(dateTimes, listSize) : null,
-        ));*/
   }
 
   SizedBox _buildSearchBox() {
@@ -292,18 +416,18 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
         ));
   }
 
-  Widget _getListView(var dateTimes, var listSize) {
+  Widget _getListView(BuildContext bldContext, var dateTimes, var listSize) {
     return ListView.builder(
         padding: const EdgeInsets.all(8),
         itemCount: listSize,
         itemBuilder: (context, i) {
           //Last button on the times list should be a back button
-          return _getItemBuilder(i, listSize, dateTimes, context);
+          return _getItemBuilder(bldContext, i, listSize, dateTimes, context);
         });
   }
 
-  StatefulWidget _getItemBuilder(
-      int i, listSize, dateTimes, BuildContext context) {
+  StatefulWidget _getItemBuilder(BuildContext bldContext, int i, listSize,
+      dateTimes, BuildContext context) {
     //Last button on the times list should be a back button
     if (!onDates && i == listSize - 1) {
       //back button for list of times
@@ -315,14 +439,12 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
       );
     }
 
-    //Create appropriate label for upcoming button
-    String buttonName = dateTimes[i];
     String subTitle = dateTimes[i];
     var isFavorite = false;
 
     //If this is a time, the button text needs a preview
     if (!onDates) {
-      buttonName = "${buttonName.substring(0, 5)}: ";
+      //buttonName = "${buttonName.substring(0, 5)}: ";
       var mapVal = curMenu[dateTimes[i]];
       var fullNote = mapVal is String
           ? mapVal
@@ -338,6 +460,9 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
       isFavorite = mapVal is String
           ? false
           : (mapVal is UserNote ? mapVal.isFavorite : mapVal["isFavorite"]);
+    } else {
+      //Button subtitle needs to be converted to a user-friendly date
+      subTitle = _generateSubtitle(subTitle);
     }
 
     return Dismissible(
@@ -356,19 +481,19 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
         color: Colors.red,
       ),
       background: Container(),
-      child: _noteCard(dateTimes[i], subTitle, isFavorite),
+      child: _noteCard(bldContext, dateTimes[i], subTitle, isFavorite),
       key: UniqueKey(),
       direction: DismissDirection.endToStart,
     );
   }
 
-  Widget _noteCard(var dateTime, String subTitle, bool isFavorite) {
-    var buttonName =
-        dateTime != subTitle ? "${dateTime.substring(0, 8)}" : dateTime;
+  Widget _noteCard(
+      BuildContext bldContext, var dateTime, String subTitle, bool isFavorite) {
+    var buttonName = _generateButtonName(dateTime);
     return Card(
       child: InkWell(
         onTap: () {
-          _buttonPressed(dateTime);
+          _buttonPressed(bldContext, dateTime);
         },
         child: Column(
           children: <Widget>[
