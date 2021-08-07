@@ -260,7 +260,7 @@ class _ViewNotesDetailState extends State<ViewNotesDetail> {
         toReturn = "Today";
       } else if (between == 1) {
         toReturn = "Yesterday";
-      } else if (between > 2 && between <= 7) {
+      } else if (between >= 2 && between <= 7) {
         toReturn = "Last ${DateFormat('EEEE').format(noteDate)}";
       } else if (between > 7 && between <= 14) {
         toReturn = "Last week";
